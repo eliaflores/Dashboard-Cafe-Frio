@@ -132,6 +132,8 @@ h3{font-size:16px;font-weight:600}
 .cov{margin:2px 0 10px}
 .cov-t{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:5px;opacity:.9}
 .bar.sm{height:7px}
+.pbar{margin-top:4px;min-width:70px}
+#pTbl td [data-o^="pf"]{white-space:nowrap}
 .on-wine .bar,.on-lime .bar{background:rgba(255,255,255,.35);border-color:transparent}
 .on-wine .bar>i{background:var(--mint)} .on-lime .bar>i{background:var(--wine)}
 #kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -467,7 +469,7 @@ details.card[open]>summary{margin-bottom:12px}
     <p class="hint" style="margin-top:10px">La otra parte de la utilidad extra paga la pintura y los detalles (etapas 2 y 3). Cuando una de las dos terminó, su parte pasa a la otra.</p>
   </div>
   <div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:8px">Quién pone cuánto</h3>
-    <div class="tw"><table class="tbl" id="pTbl"><thead><tr><th>Persona</th><th>Tipo</th><th>Aporta</th><th>Recibe en total</th><th>Pago mensual aprox.</th><th>Termina</th><th></th></tr></thead><tbody id="pBody"></tbody><tfoot id="pFoot"></tfoot></table></div>
+    <div class="tw"><table class="tbl" id="pTbl"><thead><tr><th>Persona</th><th>Tipo</th><th>Aporta</th><th>Recibe en total</th><th>Pagado</th><th>Falta</th><th>Pago mensual aprox.</th><th>Termina</th><th></th></tr></thead><tbody id="pBody"></tbody><tfoot id="pFoot"></tfoot></table></div>
     <button class="add" type="button" data-act="addPerson">+ Agregar persona</button>
   </div>
   <div class="grid two" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:14px">
@@ -733,7 +735,7 @@ function buildScen(){
   $("#scBody").innerHTML=S.scen.map(function(s,i){return '<tr data-sc="'+i+'"><td><button type="button" class="scbtn" data-act="scen" data-i="'+i+'"><span class="dot"></span>'+esc(s.n)+'</button></td><td><input class="in num" type="number" min="0" step="1" value="'+(BASE()+num(s.cups))+'" data-sc="'+i+'" data-f="tot" aria-label="Vasos al día en total, '+esc(s.n)+'"><small class="scx" data-o="scx'+i+'"></small></td><td><input class="in num" type="number" min="0" step="1" value="'+s.ev+'" data-sc="'+i+'" data-f="ev" aria-label="Eventos por mes, '+esc(s.n)+'"></td><td data-o="sc'+i+'s"></td><td data-o="sc'+i+'u"></td><td data-o="sc'+i+'p"></td></tr>'}).join("");
 }
 function buildPeople(){
-  $("#pBody").innerHTML=S.people.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" aria-label="Nombre"></td><td><select class="in" data-p="'+p.id+'" data-f="kind" aria-label="Tipo de aportación"><option value="dueno"'+(p.kind==="dueno"?" selected":"")+'>Dueño, aporta</option><option value="prestamo"'+(p.kind==="prestamo"?" selected":"")+'>Préstamo</option></select></td><td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto de '+esc(p.name)+'"></label></td><td data-o="pt'+p.id+'"></td><td data-o="pm'+p.id+'"></td><td data-o="pe'+p.id+'"></td><td><button type="button" class="x" data-act="delPerson" data-id="'+p.id+'" aria-label="Quitar">'+ic("x")+'</button></td></tr>'}).join("");
+  $("#pBody").innerHTML=S.people.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" aria-label="Nombre"></td><td><select class="in" data-p="'+p.id+'" data-f="kind" aria-label="Tipo de aportación"><option value="dueno"'+(p.kind==="dueno"?" selected":"")+'>Dueño, aporta</option><option value="prestamo"'+(p.kind==="prestamo"?" selected":"")+'>Préstamo</option></select></td><td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto de '+esc(p.name)+'"></label></td><td data-o="pt'+p.id+'"></td><td>'+(p.kind==="prestamo"?'<label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="100" value="'+num(p.paid)+'" data-p="'+p.id+'" data-f="paid" aria-label="Pagado a '+esc(p.name)+'"></label>':'—')+'</td><td><span data-o="pf'+p.id+'"></span><div class="bar sm pbar"><i id="pb'+p.id+'" style="width:0"></i></div></td><td data-o="pm'+p.id+'"></td><td data-o="pe'+p.id+'"></td><td><button type="button" class="x" data-act="delPerson" data-id="'+p.id+'" aria-label="Quitar">'+ic("x")+'</button></td></tr>'}).join("");
 }
 var GRP={park:{t:"Parques",ic:"tree",d:"Fines de semana, familias y corredores"},street:{t:"Calles concurridas",ic:"road",d:"Paso constante de gente"},colonia:{t:"Colonias medianas y grandes",ic:"home",d:"Tardes y bazares"}};
 var SPOT=["Por validar","Validado","Descartado"];
@@ -905,11 +907,17 @@ function render(){
     kpi("k-sky","Aportado","users",fmt(M.apo),gapChip.replace(/<[^>]+>/g,""))+
     kpi("k-plain","Necesario etapa 1","van",fmt(M.stage1),"Combi, equipo y permisos")+
     kpi("k-mint","Prestado","coin",fmt(M.prin),"Se devuelve con "+S.rate+"% de interés")+
-    kpi("k-wine","A devolver","return",fmt(M.loanTot),"Aprox. "+fmt(M.firstL)+" al mes");
+    kpi("k-wine","A devolver","return",fmt(M.loanTot),"Aprox. "+fmt(M.firstL)+" al mes")+
+    '<div class="kpi k-plain" id="paidKpi"></div>';
   var ft="";
-  S.people.forEach(function(p){var a=num(p.amt),pr=p.kind==="prestamo",tot=pr?a*(1+S.rate/100):0,sh=M.loanTot>0?tot/M.loanTot:0;
+  var paidAll=0;
+  S.people.forEach(function(p){var a=num(p.amt),pr=p.kind==="prestamo",tot=pr?a*(1+S.rate/100):0,sh=M.loanTot>0?tot/M.loanTot:0,pd=pr?Math.min(num(p.paid),tot):0;paidAll+=pd;
+    var bb=$("#pb"+p.id);if(bb){bb.style.width=(pr&&tot>0?pd/tot*100:0)+"%";bb.parentNode.style.display=pr?"":"none"}
+    setO("pf"+p.id,pr?(tot-pd<0.5?"Liquidado":fmt(tot-pd)):"—");
     setO("pt"+p.id,pr?fmt(tot):"—"); setO("pm"+p.id,pr?fmt(M.firstL*sh):"—"); setO("pe"+p.id,pr?(M.loanDone?label(M.loanDone):"Más de 5 años"):"—")});
-  $("#pFoot").innerHTML='<tr class="total"><td>Total</td><td></td><td>'+fmt(M.apo)+'</td><td>'+fmt(M.loanTot)+'</td><td>'+fmt(M.firstL)+'</td><td>'+(M.loanDone?label(M.loanDone):"—")+'</td><td></td></tr><tr><td colspan="7" style="text-align:left;border:0;padding-top:10px">'+gapChip+' <span class="muted">Etapa 1 necesita '+fmt(M.stage1)+' y hay '+fmt(M.apo)+' aportados.</span></td></tr>';
+  $("#pFoot").innerHTML='<tr class="total"><td>Total</td><td></td><td>'+fmt(M.apo)+'</td><td>'+fmt(M.loanTot)+'</td><td>'+fmt(paidAll)+'</td><td>'+fmt(Math.max(0,M.loanTot-paidAll))+'</td><td>'+fmt(M.firstL)+'</td><td>'+(M.loanDone?label(M.loanDone):"—")+'</td><td></td></tr><tr><td colspan="9" style="text-align:left;border:0;padding-top:10px">'+gapChip+' <span class="muted">Etapa 1 necesita '+fmt(M.stage1)+' y hay '+fmt(M.apo)+' aportados.</span></td></tr>';
+  var ppc=M.loanTot>0?Math.min(100,paidAll/M.loanTot*100):0;
+  $("#paidKpi").innerHTML='<div class="row"><span class="lab">Ya pagado a amigos</span>'+ic("check")+'</div><div class="val num">'+fmt(paidAll)+'</div><div class="bar sm" style="margin:2px 0"><i style="width:'+ppc+'%"></i></div><div class="sub">'+(M.loanTot-paidAll<0.5&&M.loanTot>0?"Préstamo liquidado":"Falta "+fmt(Math.max(0,M.loanTot-paidAll))+" · "+Math.round(ppc)+"%")+'</div>';
   $("#mBody").innerHTML=M.rows.slice(0,36).map(function(r){return '<tr><td>'+r.label+'</td><td class="'+(r.u<0?"neg":"")+'">'+fmt(r.u)+'</td><td>'+fmt(r.pL)+'</td><td>'+fmt(r.pS)+'</td><td>'+fmt(r.free)+'</td></tr>'}).join("");
   $("#chBal").innerHTML=chartBal();
   // todo
@@ -965,7 +973,7 @@ function setPath(el){
   else if(el.dataset.idea){var id_=S.ideas.filter(function(x){return x.id===el.dataset.idea})[0];if(id_)id_.amt=num(v)}
   else if(el.dataset.fw){var fo=S.follow[el.dataset.fw]=S.follow[el.dataset.fw]||{};fo.who=v}
   else if(el.dataset.fs){var fs=S.follow[el.dataset.fs]=S.follow[el.dataset.fs]||{};fs.st=parseInt(v,10)||0}
-  else if(el.dataset.p){var p=S.people.filter(function(x){return x.id===el.dataset.p})[0];if(p)p[el.dataset.f]=el.dataset.f==="amt"?num(v):v}
+  else if(el.dataset.p){var p=S.people.filter(function(x){return x.id===el.dataset.p})[0];if(p)p[el.dataset.f]=(el.dataset.f==="amt"||el.dataset.f==="paid")?num(v):v}
   else return false;
   return true;
 }
@@ -983,7 +991,7 @@ document.addEventListener("change",function(e){var el=e.target;if(el.dataset&&el
     if(k==="k")f.k=el.checked?1:0;else if((k==="s"||k==="e")&&!el.value)return;else f[k]=el.value;
     if(k==="s"&&dt(f.e)<dt(f.s))f.e=f.s; if(k==="e"&&dt(f.e)<dt(f.s))f.s=f.e;
     buildFollow();changed();return}
-  if(el.tagName==="SELECT"&&setPath(el)){if(el.dataset.fs)buildFollow();changed()}if(el.dataset&&el.dataset.act==="todo"){var t=S.todo.filter(function(x){return x.id===el.dataset.id})[0];if(t){t.done=el.checked;changed()}}});
+  if(el.tagName==="SELECT"&&setPath(el)){if(el.dataset.fs)buildFollow();if(el.dataset.p&&el.dataset.f==="kind")buildPeople();changed()}if(el.dataset&&el.dataset.act==="todo"){var t=S.todo.filter(function(x){return x.id===el.dataset.id})[0];if(t){t.done=el.checked;changed()}}});
 document.addEventListener("click",function(e){
   var go=e.target.closest("[data-go]");if(go){var s=$("#"+go.dataset.go);if(s)s.scrollIntoView({block:"start"});return}
   var b=e.target.closest("[data-act]");if(!b||b.tagName==="INPUT")return;
