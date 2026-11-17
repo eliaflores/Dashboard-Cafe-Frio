@@ -1,0 +1,43 @@
+name: Calendario y avisos
+
+# Cada 15 minutos: actualiza calendario.ics (suscripción de calendario) y manda las
+# notificaciones push de recordatorios y del resumen diario. GitHub puede retrasar unos minutos cada corrida.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["scripts/sync.mjs", ".github/workflows/sync.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar web-push
+        run: npm install --no-save --no-package-lock web-push@3.6.7
+      - name: Generar calendario y mandar avisos
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+        run: node scripts/sync.mjs
+      - name: Guardar cambios
+        run: |
+          git config user.name "cafe-frio-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add calendario.ics .github/notify-state.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "Actualizar calendario y avisos"
+          git pull --rebase origin main
+          git push origin HEAD:main
