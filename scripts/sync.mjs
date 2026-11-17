@@ -55,7 +55,7 @@ function fold(line) { const out = []; let cur = ""; for (const ch of line) { if 
 function buildICS(S) {
   const STAMP = "20260101T000000Z";
   const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Cafe Frio//Dashboard//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-    "X-WR-CALNAME:Café Frío", "X-WR-CALDESC:Frentes y recordatorios del Dashboard Café Frío", "X-WR-TIMEZONE:" + DEF_TZ,
+    "X-WR-CALNAME:Café Frío", "X-WR-CALDESC:Actividades y recordatorios del Dashboard Café Frío", "X-WR-TIMEZONE:" + DEF_TZ,
     "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H"];
   const alarm = (desc, trig) => L.push("BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc(desc), "TRIGGER:" + trig, "END:VALARM");
   const follow = S.follow || {}, names = S.areaNames || {};
@@ -64,7 +64,7 @@ function buildICS(S) {
     const done = o.st === 2;
     L.push("BEGIN:VEVENT", `UID:frente-${f.id}@cafefrio`, "DTSTAMP:" + STAMP, "DTSTART;VALUE=DATE:" + ymd(f.s), "DTEND;VALUE=DATE:" + ymd(addDaysStr(f.e, 1)),
       "SUMMARY:" + esc((done ? "✓ " : "") + (f.k ? "◆ " : "") + f.n),
-      "DESCRIPTION:" + esc(`Área: ${names[f.a] || AREAS[f.a] || "Operación"}.` + (o.who ? ` Responsable: ${o.who}.` : "") + (done ? " Hecho." : "") + ` Ver: ${SITE}#calendario`),
+      "DESCRIPTION:" + esc(`Área: ${names[f.a] || AREAS[f.a] || "Operación"}.` + (o.who ? ` Responsable: ${o.who}.` : "") + (done ? " Hecha." : "") + ` Ver: ${SITE}#calendario`),
       "TRANSP:TRANSPARENT");
     if (!done) { alarm(f.n, "PT9H"); if (f.k) { alarm("Mañana: " + f.n, "-PT15H"); alarm("En 3 días: " + f.n, "-P2DT15H"); } }
     L.push("END:VEVENT");
@@ -91,7 +91,7 @@ function dailyBody(S, today, P) {
     if (s.length) L.push("Empieza" + (s.length > 1 ? "n" : "") + ": " + s.map((f) => f.n).join(", "));
     if (e.length) L.push("Termina" + (e.length > 1 ? "n" : "") + ": " + e.map((f) => f.n).join(", "));
   }
-  if (P.late) { const lt = (S.frentes || []).filter(late); if (lt.length) L.push(lt.length === 1 ? "Atrasado: " + lt[0].n : lt.length + " frentes atrasados"); }
+  if (P.late) { const lt = (S.frentes || []).filter(late); if (lt.length) L.push(lt.length === 1 ? "Atrasada: " + lt[0].n : lt.length + " actividades atrasadas"); }
   if (P.todo) { const td = (S.todo || []).filter((t) => !t.done && String(t.due || "").slice(0, 10) === today); if (td.length) L.push(td.length === 1 ? "Recordatorio hoy: " + td[0].t : td.length + " recordatorios hoy"); }
   return L.join("\n");
 }
