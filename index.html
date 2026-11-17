@@ -1266,8 +1266,8 @@ function fillSheet(){
   $("#sh-w").value=o.who||""; $("#sh-st").value=String(o.st||0);
 }
 function openSheet(id,focus){shId=id;fillSheet();$("#fSheet").hidden=false;if(focus){var n=$("#sh-n");n.focus();n.select()}}
-function closeSheet(){shId=null;$("#fSheet").hidden=true}
-function addFrente(iso){var t=dt(iso),nf={id:"f"+uid(),n:"Nueva actividad",a:"ope",s:isoOf(t),e:isoOf(addDays(t,6)),k:0,by:DEVID,at:Date.now()};S.frentes.push(nf);changed();openSheet(nf.id,true)}
+function closeSheet(){var was=shId;shId=null;$("#fSheet").hidden=true;if(was&&pendingNew["f"+was])fireNew("f",was)}
+function addFrente(iso){var t=dt(iso),nf={id:"f"+uid(),n:"Nueva actividad",a:"ope",s:isoOf(t),e:isoOf(addDays(t,6)),k:0,by:DEVID,at:Date.now()};S.frentes.push(nf);queueNew("f",nf.id,45000);changed();openSheet(nf.id,true)}
 
 /* ---------- gráficas ---------- */
 function niceStep(r){if(r<=0)return 1;var p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p}
@@ -1523,17 +1523,20 @@ var gotRemote=false, pendingNew={};
 function venceTxt(d,time){if(!/^\d{4}-\d{2}-\d{2}$/.test(d||""))return "sin fecha";var n=dayDiff(dt(d),today()),lab=dlab(d)+(time?", "+time:"");
   return n>1?"vence en "+n+" días ("+lab+")":n===1?"vence mañana ("+lab+")":n===0?"vence hoy ("+lab+")":"venció hace "+(-n)+(n===-1?" día":" días")+" ("+lab+")"}
 function newItemText(k,it){return k==="t"?"Se agregó tarea: "+it.t+" · "+venceTxt(String(it.due||"").slice(0,10),String(it.due||"").slice(11,16)):"Se agregó actividad: "+it.n+" · "+venceTxt(it.e)}
-function queueNew(k,id){
-  if(pendingNew[k+id])return;
-  pendingNew[k+id]=setTimeout(function(){
-    delete pendingNew[k+id];
-    var it=find(k==="t"?S.todo:S.frentes,id); if(!it||(k==="t"&&it.done))return;
-    if(!UI.nf.on||UI.nf.nuevo===false||nfPerm()!=="granted")return;
-    var sent=sentLog(),key="new:"+id; if(sent[key])return;
-    notify(k==="t"?"Nueva tarea · Café Frío":"Nueva actividad · Café Frío",newItemText(k,it),"new-"+id,k==="t"?"#inicio":"#calendario");
-    sent[key]=Date.now(); saveSent(sent);
-  },45000);
+function fireNew(k,id){
+  if(pendingNew[k+id]){clearTimeout(pendingNew[k+id]);delete pendingNew[k+id]}
+  var it=find(k==="t"?S.todo:S.frentes,id); if(!it||(k==="t"&&it.done))return;
+  if(!UI.nf.on||UI.nf.nuevo===false||nfPerm()!=="granted")return;
+  var sent=sentLog(),key="new:"+id; if(sent[key])return;
+  notify(k==="t"?"Nueva tarea · Café Frío":"Nueva actividad · Café Frío",newItemText(k,it),"new-"+id,k==="t"?"#inicio":"#calendario");
+  sent[key]=Date.now(); saveSent(sent);
 }
+function queueNew(k,id,wait){
+  if(pendingNew[k+id])return;
+  pendingNew[k+id]=setTimeout(function(){fireNew(k,id)},wait||45000);
+}
+/* lo que agregaste tú: te avisa en este dispositivo (la tarea automática no te lo repite) */
+function flushOwnNew(){Object.keys(pendingNew).forEach(function(key){var k=key.charAt(0),id=key.slice(1),it=find(k==="t"?S.todo:S.frentes,id);if(it&&it.by===DEVID)fireNew(k,id)})}
 
 /* ---------- avisos en segundo plano (push) y suscripción de calendario ---------- */
 var VAPID_PUBLIC="BFmjQF89Yh_mqMJGbP3efu8Dw74fwRG22fAanPdPbqVGoEpGxYyuQ2JA1pnVSQfla8qdUjGPJErdHARzOE1G4EI", fbApp=null;
@@ -1706,7 +1709,7 @@ document.addEventListener("click",function(e){
   else if(a==="ideaSt"){var is_=find(S.ideas,id);if(is_){is_.st=(is_.st+1)%4;buildIdeas();changed()}}
   else if(a==="ideaDel"){var dl=find(S.ideas,id);if(dl&&confirm('¿Eliminar "'+dl.t+'"?')){S.ideas=S.ideas.filter(function(x){return x.id!==id});dEditing=null;buildIdeas();changed()}}
   else if(a==="delTodo"){S.todo=S.todo.filter(function(t){return t.id!==id});buildTodos();changed()}
-  else if(a==="addTodo"){var tn=$("#todoName").value.trim();if(tn){S.todo.unshift({id:uid(),t:tn,done:false,due:$("#todoDue").value||"",by:DEVID,at:Date.now()});$("#todoName").value="";$("#todoDue").value="";buildTodos();changed()}}
+  else if(a==="addTodo"){var tn=$("#todoName").value.trim();if(tn){var nid=uid();S.todo.unshift({id:nid,t:tn,done:false,due:$("#todoDue").value||"",by:DEVID,at:Date.now()});queueNew("t",nid,4000);$("#todoName").value="";$("#todoDue").value="";buildTodos();changed()}}
 });
 document.addEventListener("keydown",function(e){var t=e.target,d=t.dataset||{};
   if(e.key==="Escape"){if(shId)closeSheet();$("#calSheet").hidden=true;closeMenu();return}
@@ -1724,7 +1727,7 @@ window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(funct
 buildNav(); buildAll(); render(); showTab(); startDb();
 if(UI.nf.on&&nfPerm()==="granted"){registerSW();setTimeout(pushSync,2500)}
 setTimeout(nfCheck,1500); setInterval(nfCheck,60000);
-document.addEventListener("visibilitychange",function(){if(!document.hidden)nfCheck()});
+document.addEventListener("visibilitychange",function(){if(!document.hidden)nfCheck();else flushOwnNew()});
 })();
 </script>
 </body>
