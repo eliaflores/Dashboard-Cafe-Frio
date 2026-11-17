@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&f[]=clash-display@500,600,700&f[]=panchang@700,800&display=swap">
 <style>
-/* Paleta del brandbook Café Frío (jul 2026). Primarios: Deco #508348, Foam de lavanda #D5EAFD, Café molido #55412F, Fresa #F9DDE0.
+/* Paleta del brandbook Café Frío (jul 2026), con beige en lugar de Café molido para tarjetas y acentos. Primarios: Deco #508348, Foam de lavanda #D5EAFD, Café molido #55412F, Fresa #F9DDE0.
    Secundarios: Chai #FBFFCD, Matcha #C1DC8A, Morita #54233A, Mandarina #FFAA00. Tipografía: Clash (textos), Panchang (marca).
    Estilo: fondos claros, tarjetas blancas redondeadas y tintes pastel; Morita y Café molido solo para texto y acentos. */
 :root{
@@ -20,16 +20,16 @@
   --bg:#F6F4EC; --surface:#FFFFFF; --surface2:#F6F3EA; --ink:#33261B; --ink2:#55412F; --muted:#8A7A6B; --line:#EDE8DC;
   --accent:#54233A; --label:#508348; --field:#F8F6EF;
   --morita:#54233A; --chai:#FBFFCD; --mandarina:#FFAA00; --deco:#508348;
-  --wine:#54233A; --wine-fg:#FBFFCD; --cafe:#55412F; --sky:#D5EAFD; --sky-fg:#22384E;
-  --t-fresa:#F9DDE0; --t-foam:#DCEBFB; --t-matcha:#E7F0CF; --t-chai:#F8F9D3; --t-cafe:#EFE7DC; --t-mand:#FFEBC6;
-  --on-fresa:#54233A; --on-foam:#22384E; --on-matcha:#2F4A1B; --on-chai:#4D4320; --on-cafe:#55412F;
+  --wine:#54233A; --wine-fg:#FBFFCD; --cafe:#C4AE84; --sky:#D5EAFD; --sky-fg:#22384E;
+  --t-fresa:#F9DDE0; --t-foam:#DCEBFB; --t-matcha:#E7F0CF; --t-chai:#F8F9D3; --t-cafe:#F3ECDD; --t-mand:#FFEBC6;
+  --on-fresa:#54233A; --on-foam:#22384E; --on-matcha:#2F4A1B; --on-chai:#4D4320; --on-cafe:#5E4E33;
   --good:#3F6E38; --good-bg:#E3EFC9; --warn:#8A5300; --warn-bg:#FFEBC2; --bad:#9E2A3A; --bad-bg:#F9DDE0;
   --chart-line:#54233A; --chart-area:rgba(193,220,138,.45); --chart-grid:#EDE8DC; --chart-text:#8A7A6B;
   --shadow:0 1px 2px rgba(51,38,27,.04),0 12px 32px rgba(51,38,27,.06);
   --glass:rgba(255,255,255,.72);
   --a-din:#508348; --a-din-b:#E1EDD9; --a-din-f:#2D4F27;
   --a-tra:#54233A; --a-tra-b:#F6E0E6; --a-tra-f:#54233A;
-  --a-com:#55412F; --a-com-b:#EEE5DA; --a-com-f:#55412F;
+  --a-com:#C4AE84; --a-com-b:#F4EDDF; --a-com-f:#5E4E33;
   --a-ope:#8FB84E; --a-ope-b:#EAF3D3; --a-ope-f:#3C5719;
   --a-ven:#E89A00; --a-ven-b:#FFEDC7; --a-ven-f:#6B4500;
   --f-display:"Clash Display","Clash Grotesk","Inter",system-ui,sans-serif; --f-brand:"Panchang","Clash Display","Inter",system-ui,sans-serif;
@@ -40,26 +40,26 @@
   color-scheme:dark;
   --bg:#16110D; --surface:#211A14; --surface2:#2A221B; --ink:#F4F0E4; --ink2:#E2D6C6; --muted:#ABA092; --line:#382F26;
   --accent:#F9DDE0; --label:#A9CF7B; --field:#1B1511;
-  --wine:#6A2D49; --cafe:#7A6047; --sky:#22364A; --sky-fg:#D5EAFD;
-  --t-fresa:#3A2330; --t-foam:#1F3346; --t-matcha:#26341A; --t-chai:#33331C; --t-cafe:#30261D; --t-mand:#3A2C10;
-  --on-fresa:#F9DDE0; --on-foam:#D5EAFD; --on-matcha:#DDEFC0; --on-chai:#F4F6C9; --on-cafe:#EADBC8;
+  --wine:#6A2D49; --cafe:#A8936B; --sky:#22364A; --sky-fg:#D5EAFD;
+  --t-fresa:#3A2330; --t-foam:#1F3346; --t-matcha:#26341A; --t-chai:#33331C; --t-cafe:#2E291F; --t-mand:#3A2C10;
+  --on-fresa:#F9DDE0; --on-foam:#D5EAFD; --on-matcha:#DDEFC0; --on-chai:#F4F6C9; --on-cafe:#EBE1C9;
   --good:#B7DA8C; --good-bg:#26391F; --warn:#FFC85A; --warn-bg:#3D2E12; --bad:#F4A9B6; --bad-bg:#4A2030;
   --chart-line:#F9DDE0; --chart-area:rgba(169,207,123,.25); --chart-grid:#382F26; --chart-text:#ABA092;
   --shadow:none; --glass:rgba(255,255,255,.07);
   --a-din:#6FA864; --a-din-b:#22331D; --a-din-f:#C4E3B8; --a-tra:#C27A99; --a-tra-b:#3A1F2B; --a-tra-f:#F4C9D6;
-  --a-com:#A88463; --a-com-b:#33281F; --a-com-f:#EAD8C3; --a-ope:#A9CF7B; --a-ope-b:#2A3719; --a-ope-f:#D8EDB6; --a-ven:#FFB834; --a-ven-b:#3B2C0E; --a-ven-f:#FFDCA0}}
+  --a-com:#B9A274; --a-com-b:#312B1F; --a-com-f:#EBE1C9; --a-ope:#A9CF7B; --a-ope-b:#2A3719; --a-ope-f:#D8EDB6; --a-ven:#FFB834; --a-ven-b:#3B2C0E; --a-ven-f:#FFDCA0}}
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#16110D; --surface:#211A14; --surface2:#2A221B; --ink:#F4F0E4; --ink2:#E2D6C6; --muted:#ABA092; --line:#382F26;
   --accent:#F9DDE0; --label:#A9CF7B; --field:#1B1511;
-  --wine:#6A2D49; --cafe:#7A6047; --sky:#22364A; --sky-fg:#D5EAFD;
-  --t-fresa:#3A2330; --t-foam:#1F3346; --t-matcha:#26341A; --t-chai:#33331C; --t-cafe:#30261D; --t-mand:#3A2C10;
-  --on-fresa:#F9DDE0; --on-foam:#D5EAFD; --on-matcha:#DDEFC0; --on-chai:#F4F6C9; --on-cafe:#EADBC8;
+  --wine:#6A2D49; --cafe:#A8936B; --sky:#22364A; --sky-fg:#D5EAFD;
+  --t-fresa:#3A2330; --t-foam:#1F3346; --t-matcha:#26341A; --t-chai:#33331C; --t-cafe:#2E291F; --t-mand:#3A2C10;
+  --on-fresa:#F9DDE0; --on-foam:#D5EAFD; --on-matcha:#DDEFC0; --on-chai:#F4F6C9; --on-cafe:#EBE1C9;
   --good:#B7DA8C; --good-bg:#26391F; --warn:#FFC85A; --warn-bg:#3D2E12; --bad:#F4A9B6; --bad-bg:#4A2030;
   --chart-line:#F9DDE0; --chart-area:rgba(169,207,123,.25); --chart-grid:#382F26; --chart-text:#ABA092;
   --shadow:none; --glass:rgba(255,255,255,.07);
   --a-din:#6FA864; --a-din-b:#22331D; --a-din-f:#C4E3B8; --a-tra:#C27A99; --a-tra-b:#3A1F2B; --a-tra-f:#F4C9D6;
-  --a-com:#A88463; --a-com-b:#33281F; --a-com-f:#EAD8C3; --a-ope:#A9CF7B; --a-ope-b:#2A3719; --a-ope-f:#D8EDB6; --a-ven:#FFB834; --a-ven-b:#3B2C0E; --a-ven-f:#FFDCA0}
+  --a-com:#B9A274; --a-com-b:#312B1F; --a-com-f:#EBE1C9; --a-ope:#A9CF7B; --a-ope-b:#2A3719; --a-ope-f:#D8EDB6; --a-ven:#FFB834; --a-ven-b:#3B2C0E; --a-ven-f:#FFDCA0}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
