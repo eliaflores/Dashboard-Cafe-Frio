@@ -7,7 +7,10 @@
 <script>try{var u=JSON.parse(localStorage.getItem("cafefrio-ui")||"{}");document.documentElement.setAttribute("data-theme",u.theme||"light")}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Café Frío · Plan</title>
+<title>Dashboard Café Frío</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Café Frío">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -79,9 +82,9 @@ a{color:var(--label)}
 /* ---------- app shell ---------- */
 .side{position:fixed;top:0;bottom:0;left:0;width:248px;background:var(--surface);border-right:1px solid var(--line);color:var(--ink);display:flex;flex-direction:column;padding:24px 14px calc(16px + env(safe-area-inset-bottom,0px));z-index:50;overflow-y:auto}
 .brand{display:flex;align-items:center;gap:11px;padding:0 8px 26px}
-.logo{width:42px;height:42px;border-radius:14px;background:var(--morita);color:var(--chai);display:grid;place-items:center;flex:none}
+.logo{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--line)}
 .logo .ic{width:22px;height:22px}
-.brand b{display:block;font:800 15px/1 var(--f-brand);letter-spacing:.02em;text-transform:uppercase;color:var(--accent)}
+.brand b{display:block;font:600 16px/1.15 var(--f-display);color:var(--accent)}
 .brand small{display:block;font:500 10px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:6px}
 .nav{display:flex;flex-direction:column;gap:4px}
 .nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:14px;color:var(--ink2);text-decoration:none;font-size:15px;font-weight:500;transition:background .15s}
@@ -120,7 +123,7 @@ a{color:var(--label)}
 .tab-h .sub,.hello .sub{margin:8px 0 0;color:var(--muted);max-width:66ch}
 .tab-h .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .hello{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
-.avatar{width:52px;height:52px;border-radius:50%;background:var(--t-fresa);color:var(--on-fresa);display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 3px var(--surface)}
+.avatar{width:58px;height:58px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 3px var(--surface),var(--shadow)}
 .avatar .ic{width:26px;height:26px}
 .ib{border:0;background:var(--surface);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--ink);font-size:18px;line-height:1;box-shadow:var(--shadow)}
 .ib:hover{background:var(--surface2)}
@@ -522,7 +525,7 @@ tr.sel .scx{color:inherit;opacity:.8}
 <div class="scrim" id="scrim" hidden></div>
 
 <aside class="side" id="side" aria-label="Menú">
-  <div class="brand"><span class="logo"><svg class="ic"><use href="#i-cup"/></svg></span><div><b>Café Frío</b><small>Plan de inversión y arranque</small></div></div>
+  <div class="brand"><img class="logo" src="assets/logo.jpg" alt="Café Frío"><div><b>Dashboard Café Frío</b><small>Plan de inversión y arranque</small></div></div>
   <nav class="nav" id="nav"></nav>
   <div class="side-box"><span class="side-lab">Escenario de ventas</span><div class="seg seg-scen" role="group" aria-label="Escenario de ventas"></div></div>
   <div class="side-foot"><nav class="nav" id="navSet"></nav><div class="save" data-s="local" role="status" style="margin-top:12px;padding:0 6px"><i></i><span>Solo en este dispositivo</span></div></div>
@@ -542,7 +545,7 @@ tr.sel .scx{color:inherit;opacity:.8}
 <section id="inicio" class="tab">
   <div class="hello">
     <div><p class="kicker" id="todayTxt"></p><h1 id="helloT">Hola, equipo</h1><p class="sub" id="helloSub">Nos alegra que estés aquí :-) Este es el resumen del plan.</p></div>
-    <span class="avatar" aria-hidden="true"><svg class="ic"><use href="#i-cup"/></svg></span>
+    <img class="avatar" src="assets/logo.jpg" alt="Café Frío">
   </div>
 
   <div class="home">
@@ -1025,7 +1028,7 @@ function showTab(){
   $$(".tab").forEach(function(s){s.hidden=s.id!==id});
   $$("#nav a,#bnav a,#navSet a").forEach(function(a){if(a.dataset.tab===id)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   $("#tbTitle").textContent=TABS.filter(function(t){return t.id===id})[0].t;
-  document.title=(id==="inicio"?"":$("#tbTitle").textContent+" · ")+"Café Frío";
+  document.title=(id==="inicio"?"":$("#tbTitle").textContent+" · ")+"Dashboard Café Frío";
   closeMenu(); window.scrollTo(0,0);
 }
 function openMenu(){$("#side").classList.add("open");$("#scrim").hidden=false}
