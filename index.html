@@ -557,7 +557,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 <!-- =============== INICIO =============== -->
 <section id="inicio" class="tab">
   <div class="hello">
-    <div><p class="kicker" id="todayTxt"></p><h1 id="helloT">Hola, equipo</h1><p class="sub" id="helloSub">Nos alegra que estés aquí :-) Este es el resumen del plan.</p></div>
+    <div><p class="kicker" id="todayTxt"></p><h1 id="helloT">Hola</h1></div>
     <img class="avatar" src="assets/logo.jpg" alt="Café Frío">
   </div>
 
@@ -827,14 +827,6 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
     </div>
 
     <div class="stack">
-      <div class="card">
-        <div class="card-h"><h3>Saludo</h3><span class="chip">Para todos</span></div>
-        <div class="nm-grid">
-          <label>Nombre en el saludo<input class="in" type="text" data-txt="hello" placeholder="equipo"></label>
-          <label>Frase de bienvenida<input class="in" type="text" data-txt="tagline" placeholder="Nos alegra que estés aquí :-)"></label>
-        </div>
-      </div>
-
       <div class="card">
         <div class="card-h"><h3>Nombres</h3><span class="chip">Para todos</span></div>
         <p class="set-h">Etapas</p>
@@ -1133,7 +1125,6 @@ function buildInputs(){
   $$("[data-stn]").forEach(function(el){el.value=stName(el.dataset.stn)});
   $("#f-startM").innerHTML=MES.map(function(m,i){return '<option value="'+(i+1)+'"'+(S.startM===i+1?" selected":"")+'>'+m+'</option>'}).join("");
   buildAreaOpts();
-  $$("[data-txt]").forEach(function(el){el.value=S[el.dataset.txt]||""});
   buildSettings();
 }
 
@@ -1316,7 +1307,7 @@ function render(){
   else{vs="bad";vt="Se tarda "+months(A.pb)+" en recuperar la etapa 1";vx="Con "+fmt(A.u)+" de utilidad extra al mes el plazo es largo. Conviene empujar eventos o cambiar de punto."}
   v.dataset.s=vs; $("#vTitle").textContent=vt; $("#vText").textContent=vx;
   // inicio
-  var hr=td.getHours(); $("#helloT").textContent=(hr<12?"Buenos días":hr<19?"Buenas tardes":"Buenas noches")+", "+((S.hello||"").trim()||"equipo"); $("#helloSub").textContent=(S.tagline||"").trim()||DEF.tagline;
+  var hr=td.getHours(); $("#helloT").textContent=hr<12?"Buenos días":hr<19?"Buenas tardes":"Buenas noches";
   $("#vChip").textContent=vs==="good"?"Viable":vs==="warn"?"Plazo largo":"Revisar";
   function stat(c,lab,icn,val,sub,href,extra){return '<a class="kpi '+c+'" href="'+href+'"><div class="row">'+ic(icn)+'<span class="lab">'+lab+'</span></div><span class="go">'+ic("arrow")+'</span><div class="val num">'+val+'</div>'+(extra||"")+'<div class="sub">'+sub+'</div></a>'}
   $("#homeKpis").innerHTML=
