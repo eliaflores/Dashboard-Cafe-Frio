@@ -54,8 +54,8 @@ DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261126
 SUMMARY:Hielera- Congelador con Compresor
-DESCRIPTION:Área: Decisiones y dinero. Ver: https://eliaflores.github.io
- /Dashboard-Cafe-Frio/#calendario
+DESCRIPTION:Área: Equipo e instalación. Ver: https://eliaflores.github.
+ io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -66,7 +66,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:frente-f7@cafefrio
 DTSTAMP:20260101T000000Z
-DTSTART;VALUE=DATE:20261114
+DTSTART;VALUE=DATE:20261117
 DTEND;VALUE=DATE:20261121
 SUMMARY:Batidora KintchenAId
 DESCRIPTION:Área: Equipo e instalación. Ver: https://eliaflores.github.
@@ -129,8 +129,8 @@ DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261124
 DTEND;VALUE=DATE:20261201
 SUMMARY:Impresión: menú\, QR y tarjetas de sellos
-DESCRIPTION:Área: Operación. Ver: https://eliaflores.github.io/Dashboar
- d-Cafe-Frio/#calendario
+DESCRIPTION:Área: Equipo e instalación. Ver: https://eliaflores.github.
+ io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -230,21 +230,6 @@ TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:Firmar carta Joaquin y Maggie
-TRIGGER:PT9H
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:frente-fbra6s3@cafefrio
-DTSTAMP:20260101T000000Z
-DTSTART;VALUE=DATE:20261117
-DTEND;VALUE=DATE:20261124
-SUMMARY:Nuevo frente
-DESCRIPTION:Área: Operación. Ver: https://eliaflores.github.io/Dashboar
- d-Cafe-Frio/#calendario
-TRANSP:TRANSPARENT
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Nuevo frente
 TRIGGER:PT9H
 END:VALARM
 END:VEVENT
