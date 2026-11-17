@@ -7,7 +7,7 @@ import { readFile, writeFile } from "node:fs/promises";
 const PROJECT = "cafe-frio-99061";
 const API_KEY = "AIzaSyD13FQVS_tKEb6JGGT0dHSe1S1tIrkp5pM";
 const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
-const SITE = "https://eliaflores.github.io/Cafe-Frio/";
+const SITE = "https://eliaflores.github.io/Dashboard-Cafe-Frio/";
 const VAPID_PUBLIC = "BFmjQF89Yh_mqMJGbP3efu8Dw74fwRG22fAanPdPbqVGoEpGxYyuQ2JA1pnVSQfla8qdUjGPJErdHARzOE1G4EI";
 const STATE_FILE = ".github/notify-state.json";
 const DEF_TZ = "America/Chihuahua";

@@ -1504,7 +1504,7 @@ function pushOff(){
   if(fbApp&&id)fbApp.firestore().collection("subs").doc(id).delete().catch(function(){});
   if(pushSupported())navigator.serviceWorker.getRegistration().then(function(r){if(r&&r.pushManager)r.pushManager.getSubscription().then(function(s){if(s)s.unsubscribe()})});
 }
-function calUrl(){var base=/^https?:/.test(location.protocol)?location.origin+location.pathname.replace(/[^\/]*$/,""):"https://eliaflores.github.io/Cafe-Frio/";return base+"calendario.ics"}
+function calUrl(){var base=/^https?:/.test(location.protocol)?location.origin+location.pathname.replace(/[^\/]*$/,""):"https://eliaflores.github.io/Dashboard-Cafe-Frio/";return base+"calendario.ics"}
 function csOpen(){
   var u=calUrl(), w=u.replace(/^https?:/,"webcal:"), g="https://calendar.google.com/calendar/r?cid="+encodeURIComponent(w);
   $("#csApple").href=w; $("#csGoogle").href=g; $("#csSamsung").href=g; $("#csNotion").href=g; $("#csUrl").textContent=u; $("#csMsg").textContent="";

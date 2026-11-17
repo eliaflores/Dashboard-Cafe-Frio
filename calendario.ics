@@ -15,7 +15,7 @@ DTSTART;VALUE=DATE:20261110
 DTEND;VALUE=DATE:20261121
 SUMMARY:✓ Comprar Cafetera
 DESCRIPTION:Área: Decisiones y dinero. Hecho. Ver: https://eliaflores.gi
- thub.io/Cafe-Frio/#calendario
+ thub.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
@@ -25,7 +25,7 @@ DTSTART;VALUE=DATE:20261114
 DTEND;VALUE=DATE:20261130
 SUMMARY:Carpinteria
 DESCRIPTION:Área: Decisiones y dinero. Ver: https://eliaflores.github.io
- /Cafe-Frio/#calendario
+ /Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -40,7 +40,7 @@ DTSTART;VALUE=DATE:20261130
 DTEND;VALUE=DATE:20261208
 SUMMARY:Conseguir y hacer Sistema hidraulica Autonomo
 DESCRIPTION:Área: Decisiones y dinero. Ver: https://eliaflores.github.io
- /Cafe-Frio/#calendario
+ /Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -55,7 +55,7 @@ DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261126
 SUMMARY:Hielera- Congelador con Compresor
 DESCRIPTION:Área: Decisiones y dinero. Ver: https://eliaflores.github.io
- /Cafe-Frio/#calendario
+ /Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -69,8 +69,8 @@ DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261214
 DTEND;VALUE=DATE:20261221
 SUMMARY:Batidora KintchenAId
-DESCRIPTION:Área: Trámites. Ver: https://eliaflores.github.io/Cafe-Frio
- /#calendario
+DESCRIPTION:Área: Trámites. Ver: https://eliaflores.github.io/Dashboard
+ -Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -84,8 +84,8 @@ DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261222
 DTEND;VALUE=DATE:20261229
 SUMMARY:Permiso de vía pública
-DESCRIPTION:Área: Trámites. Ver: https://eliaflores.github.io/Cafe-Frio
- /#calendario
+DESCRIPTION:Área: Trámites. Ver: https://eliaflores.github.io/Dashboard
+ -Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -100,7 +100,7 @@ DTSTART;VALUE=DATE:20261214
 DTEND;VALUE=DATE:20261229
 SUMMARY:Estudios para constancia IMPAS
 DESCRIPTION:Área: Equipo e instalación. Ver: https://eliaflores.github.
- io/Cafe-Frio/#calendario
+ io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -115,7 +115,7 @@ DTSTART;VALUE=DATE:20261221
 DTEND;VALUE=DATE:20261224
 SUMMARY:Segundo Molino
 DESCRIPTION:Área: Equipo e instalación. Ver: https://eliaflores.github.
- io/Cafe-Frio/#calendario
+ io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -129,8 +129,8 @@ DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261124
 DTEND;VALUE=DATE:20261201
 SUMMARY:Impresión: menú\, QR y tarjetas de sellos
-DESCRIPTION:Área: Operación. Ver: https://eliaflores.github.io/Cafe-Fri
- o/#calendario
+DESCRIPTION:Área: Operación. Ver: https://eliaflores.github.io/Dashboar
+ d-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -145,7 +145,7 @@ DTSTART;VALUE=DATE:20261127
 DTEND;VALUE=DATE:20261128
 SUMMARY:◆ Hacer base de datos pagina
 DESCRIPTION:Área: Operación. Responsable: Diego. Ver: https://eliaflore
- s.github.io/Cafe-Frio/#calendario
+ s.github.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -170,7 +170,7 @@ DTSTART;VALUE=DATE:20261130
 DTEND;VALUE=DATE:20261201
 SUMMARY:◆ Lanzamiento
 DESCRIPTION:Área: Ventas y marketing. Ver: https://eliaflores.github.io/
- Cafe-Frio/#calendario
+ Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -195,7 +195,7 @@ DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261119
 SUMMARY:Dinero Pt 1
 DESCRIPTION:Área: Operación. Responsable: Todos . Ver: https://eliaflor
- es.github.io/Cafe-Frio/#calendario
+ es.github.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -210,7 +210,7 @@ DTSTART;VALUE=DATE:20261130
 DTEND;VALUE=DATE:20261201
 SUMMARY:Dinero Pt 2
 DESCRIPTION:Área: Operación. Responsable: Todos. Ver: https://eliaflore
- s.github.io/Cafe-Frio/#calendario
+ s.github.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -225,11 +225,26 @@ DTSTART;VALUE=DATE:20261116
 DTEND;VALUE=DATE:20261130
 SUMMARY:Firmar carta Joaquin y Maggie
 DESCRIPTION:Área: Operación. Responsable: Joaquin Maggie. Ver: https://
- eliaflores.github.io/Cafe-Frio/#calendario
+ eliaflores.github.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:Firmar carta Joaquin y Maggie
+TRIGGER:PT9H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:frente-fbra6s3@cafefrio
+DTSTAMP:20260101T000000Z
+DTSTART;VALUE=DATE:20261117
+DTEND;VALUE=DATE:20261124
+SUMMARY:Nuevo frente
+DESCRIPTION:Área: Operación. Ver: https://eliaflores.github.io/Dashboar
+ d-Cafe-Frio/#calendario
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Nuevo frente
 TRIGGER:PT9H
 END:VALARM
 END:VEVENT
