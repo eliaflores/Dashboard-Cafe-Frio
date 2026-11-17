@@ -564,7 +564,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 <!-- =============== INICIO =============== -->
 <section id="inicio" class="tab">
   <div class="hello">
-    <div><p class="kicker" id="todayTxt"></p><h1 id="helloT">Hola</h1></div>
+    <div><p class="kicker" id="todayTxt"></p><h1 id="helloT">Hola</h1><p class="sub" id="helloSub" hidden></p></div>
     <img class="avatar" src="assets/logo.jpg" alt="Café Frío">
   </div>
 
@@ -835,6 +835,15 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 
     <div class="stack">
       <div class="card">
+        <div class="card-h"><h3>Saludo</h3><span class="chip">Para todos</span></div>
+        <div class="nm-grid">
+          <label>Nombre en el saludo<input class="in" type="text" data-txt="hello" placeholder="Opcional, por ejemplo: equipo"></label>
+          <label>Frase debajo del saludo<input class="in" type="text" data-txt="tagline" placeholder="Opcional"></label>
+        </div>
+        <p class="hint" style="margin-top:10px">Si los dejas vacíos, el inicio solo dice "Buenos días", "Buenas tardes" o "Buenas noches".</p>
+      </div>
+
+      <div class="card">
         <div class="card-h"><h3>Nombres</h3><span class="chip">Para todos</span></div>
         <p class="set-h">Etapas</p>
         <div class="nm-grid">
@@ -970,7 +979,7 @@ var DEF={
   {id:"t16",t:"Comparar comisiones de Mercado Pago, Clip y el banco (sin renta mensual)",done:false},
   {id:"t17",t:"Cotizar tres seguros con responsabilidad civil para uso comercial",done:false}
  ],
- follow:{}, ver:4, hello:"equipo", tagline:"Nos alegra que estés aquí :-) Este es el resumen del plan.", areaNames:{},
+ follow:{}, ver:5, hello:"", tagline:"", areaNames:{},
  ideas:[
   {id:"i1",t:"Tarjeta de sellos: 10 sellos = 1 bebida gratis",note:"Promoción de lanzamiento que no regala margen.",amt:0,st:0},
   {id:"i2",t:"WhatsApp Business con catálogo de bebidas",note:"Estado diario de \"hoy estamos en…\".",amt:0,st:0},
@@ -1029,6 +1038,11 @@ function merge(src){
     o.todo.forEach(function(t){var r=V4_REN.todo[t.id];if(r&&t.t===r[0])t.t=r[1]});
     o.ideas.forEach(function(t){var r=V4_REN.ideas[t.id];if(r&&t.t===r[0])t.t=r[1]});
     o.ver=4;
+  }
+  if(!(o.ver>=5)){
+    if(String(o.hello||"").trim().toLowerCase()==="equipo")o.hello="";
+    if(/nos alegra|este es el resumen/i.test(String(o.tagline||"")))o.tagline="";
+    o.ver=5;
   }
   o.follow=o.follow||{}; o.stageNames=o.stageNames||clone(DEF.stageNames);
   return o;
@@ -1132,6 +1146,7 @@ function buildInputs(){
   $$("[data-stn]").forEach(function(el){el.value=stName(el.dataset.stn)});
   $("#f-startM").innerHTML=MES.map(function(m,i){return '<option value="'+(i+1)+'"'+(S.startM===i+1?" selected":"")+'>'+m+'</option>'}).join("");
   buildAreaOpts();
+  $$("[data-txt]").forEach(function(el){el.value=S[el.dataset.txt]||""});
   buildSettings();
 }
 
@@ -1314,7 +1329,7 @@ function render(){
   else{vs="bad";vt="Se tarda "+months(A.pb)+" en recuperar la etapa 1";vx="Con "+fmt(A.u)+" de utilidad extra al mes el plazo es largo. Conviene empujar eventos o cambiar de punto."}
   v.dataset.s=vs; $("#vTitle").textContent=vt; $("#vText").textContent=vx;
   // inicio
-  var hr=td.getHours(); $("#helloT").textContent=hr<12?"Buenos días":hr<19?"Buenas tardes":"Buenas noches";
+  var hr=td.getHours(); var hn=String(S.hello||"").trim(), tg=String(S.tagline||"").trim(); $("#helloT").textContent=(hr<12?"Buenos días":hr<19?"Buenas tardes":"Buenas noches")+(hn?", "+hn:""); $("#helloSub").textContent=tg; $("#helloSub").hidden=!tg;
   $("#vChip").textContent=vs==="good"?"Viable":vs==="warn"?"Plazo largo":"Revisar";
   function stat(c,lab,icn,val,sub,href,extra){return '<a class="kpi '+c+'" href="'+href+'"><div class="row">'+ic(icn)+'<span class="lab">'+lab+'</span></div><span class="go">'+ic("arrow")+'</span><div class="val num">'+val+'</div>'+(extra||"")+'<div class="sub">'+sub+'</div></a>'}
   $("#homeKpis").innerHTML=
