@@ -262,6 +262,10 @@ tr.sel .scx{color:inherit;opacity:.8}
   #oTbl tfoot tr.total{display:flex;justify-content:space-between;border-radius:12px;background:var(--surface2);margin-top:8px}
   #oTbl tfoot tr.total td{background:none} #oTbl tfoot tr.total td:empty{display:none}
 }
+.own-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.own-l{font-weight:600;color:var(--ink2)}
+.money.own-m{width:200px}.money.own-m input{font-size:20px;font-weight:700;padding:10px 12px 10px 4px}
+@media (max-width:640px){.money.own-m{width:100%}}
 #pTbl td:first-child .in,#oTbl td:first-child .in{min-width:150px} #oTbl td:nth-child(2) .in{min-width:200px} #oTbl input[type=date]{min-width:150px}
 
 /* ---------- etapas ---------- */
@@ -776,9 +780,9 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
     <p class="hint" style="margin-top:10px">La otra parte de la utilidad extra paga las etapas 2 y 3. Cuando una de las dos termina, su parte pasa a la otra.</p>
   </div>
   <div class="card sp"><div class="card-h"><h3>Dinero de los dueños</h3><span class="chip good">No es préstamo</span></div>
-    <p class="hint" style="margin:-6px 0 10px">Cada aportación de Maggie y Joaquín al negocio. Suma a lo reunido, pero no se devuelve ni cobra interés.</p>
-    <div class="tw"><table class="tbl" id="oTbl" style="min-width:640px"><thead><tr><th>Quién</th><th>Concepto</th><th>Fecha</th><th>Monto</th><th></th></tr></thead><tbody id="oBody"></tbody><tfoot id="oFoot"></tfoot></table></div>
-    <button class="add" type="button" data-act="addOwner">+ Agregar aportación de los dueños</button>
+    <div class="own-row"><label class="own-l" for="f-own">Total puesto por Maggie y Joaquín</label><label class="money own-m"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" id="f-own" data-own="1" aria-label="Total puesto por los dueños"></label></div>
+    <p class="hint" style="margin-top:10px">Suma a lo reunido, pero no se devuelve ni cobra interés. Cambia el número cada vez que pongan más.</p>
+    <p class="hint" style="margin-top:6px" id="ownGap"></p>
   </div>
   <div class="card sp"><div class="card-h"><h3>Préstamo de amigos</h3><span class="chip">Se devuelve</span></div>
     <div class="tw"><table class="tbl" id="pTbl" style="min-width:820px"><thead><tr><th>Persona</th><th>Presta</th><th>Recibe en total</th><th>Pagado</th><th>Falta</th><th>Pago mensual aprox.</th><th>Termina</th><th></th></tr></thead><tbody id="pBody"></tbody><tfoot id="pFoot"></tfoot></table></div>
@@ -1155,7 +1159,8 @@ function buildScen(){
 }
 function buildPeople(){
   var own=S.people.filter(function(p){return p.kind!=="prestamo"}), loans=S.people.filter(function(p){return p.kind==="prestamo"});
-  $("#oBody").innerHTML=own.length?own.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" placeholder="Maggie y Joaquín" aria-label="Quién aporta"></td>'+
+  var fo=$("#f-own"); if(fo&&document.activeElement!==fo)fo.value=own.reduce(function(t,p){return t+num(p.amt)},0)||"";
+  if(false)$("#oBody").innerHTML=own.length?own.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" placeholder="Maggie y Joaquín" aria-label="Quién aporta"></td>'+
     '<td><input class="in" type="text" value="'+esc(p.note||"")+'" data-p="'+p.id+'" data-f="note" placeholder="Opcional, por ejemplo: cafetera" aria-label="Concepto"></td>'+
     '<td><input class="in" type="date" value="'+esc(p.date||"")+'" data-p="'+p.id+'" data-f="date" aria-label="Fecha"></td>'+
     '<td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto"></label></td>'+
@@ -1419,7 +1424,7 @@ function render(){
     setO("pf"+p.id,pr?(tot-pd<0.5?"Liquidado":fmt(tot-pd)):"—");
     setO("pt"+p.id,pr?fmt(tot):"—"); setO("pm"+p.id,pr?fmt(M.firstL*sh):"—"); setO("pe"+p.id,pr?(M.loanDone?label(M.loanDone):"Más de 5 años"):"—")});
   $("#pFoot").innerHTML='<tr class="total"><td>Total</td><td>'+fmt(M.prin)+'</td><td>'+fmt(M.loanTot)+'</td><td>'+fmt(M.paidAll)+'</td><td>'+fmt(Math.max(0,M.loanTot-M.paidAll))+'</td><td>'+fmt(M.firstL)+'</td><td>'+(M.loanDone?label(M.loanDone):"—")+'</td><td></td></tr>';
-  $("#oFoot").innerHTML='<tr class="total"><td>Total de los dueños</td><td></td><td></td><td>'+fmt(M.own)+'</td><td></td></tr><tr><td colspan="5" style="text-align:left;border:0;padding-top:10px">'+gapChip+' <span class="muted">Etapa 1 necesita '+fmt(M.stage1)+' y entre dueños y amigos hay '+fmt(M.apo)+'.</span></td></tr>';
+  var og=$("#ownGap"); if(og)og.innerHTML=gapChip+' <span class="muted">Etapa 1 necesita '+fmt(M.stage1)+' y entre dueños y amigos hay '+fmt(M.apo)+'.</span>';
   setO("gapOpen",fmt(Math.max(0,tot3-M.apo)));
   setO("rateTxt",f1(S.rate)+"%"); setO("shareTxt",f1(S.share)+"%");
   $("#mBody").innerHTML=M.rows.slice(0,36).map(function(r){return '<tr><td>'+r.label+'</td><td class="'+(r.u<0?"neg":"")+'">'+fmt(r.u)+'</td><td>'+fmt(r.pL)+'</td><td>'+fmt(r.pS)+'</td><td>'+fmt(r.free)+'</td></tr>'}).join("");
@@ -1659,6 +1664,9 @@ function setPath(el){
   else if(d.idea){var id_=find(S.ideas,d.idea);if(id_)id_.amt=num(v)}
   else if(d.fw){var fo=S.follow[d.fw]=S.follow[d.fw]||{};fo.who=v}
   else if(d.fs){var fs=S.follow[d.fs]=S.follow[d.fs]||{};fs.st=parseInt(v,10)||0}
+  else if(d.own){var os=S.people.filter(function(x){return x.kind!=="prestamo"}),o=os[0];
+    if(!o){o={id:uid(),name:"Maggie y Joaquín",kind:"dueno",amt:0};S.people.unshift(o)}
+    o.amt=num(v); if(os.length>1)S.people=S.people.filter(function(x){return x.kind==="prestamo"||x===o})}
   else if(d.p){var p=find(S.people,d.p);if(p)p[d.f]=(d.f==="amt"||d.f==="paid")?num(v):v}
   else return false;
   return true;
