@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#54233A">
+<meta name="theme-color" content="#F3EBDD">
+<meta name="color-scheme" content="light only">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Café Frío · Plan</title>
@@ -16,7 +17,7 @@
    Secundarios: Chai #FBFFCD, Matcha #C1DC8A, Morita #54233A, Mandarina #FFAA00. Tipografía: Clash (textos), Panchang (marca).
    Estilo: fondos claros, tarjetas blancas redondeadas y tintes pastel; Morita y Café molido solo para texto y acentos. */
 :root{
-  color-scheme:light;
+  color-scheme:light only;
   --bg:#F3EBDD; --surface:#FFFFFF; --surface2:#F7F2E9; --ink:#33261B; --ink2:#55412F; --muted:#8A7A6B; --line:#EDE8DC;
   --accent:#54233A; --label:#508348; --field:#FAF6EF;
   --morita:#54233A; --chai:#FBFFCD; --mandarina:#FFAA00; --deco:#508348;
@@ -36,31 +37,6 @@
   --f-body:"Clash Grotesk","Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --f-num:"Inter",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
   --evh:22px; --cellh:100px; --r:22px;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  color-scheme:dark;
-  --bg:#16110D; --surface:#211A14; --surface2:#2A221B; --ink:#F4F0E4; --ink2:#E2D6C6; --muted:#ABA092; --line:#382F26;
-  --accent:#F9DDE0; --label:#A9CF7B; --field:#1B1511;
-  --wine:#6A2D49; --cafe:#7A6047; --sky:#22364A; --sky-fg:#D5EAFD;
-  --t-fresa:#3A2330; --t-foam:#1F3346; --t-matcha:#26341A; --t-chai:#33331C; --t-cafe:#30261D; --t-mand:#3A2C10;
-  --on-fresa:#F9DDE0; --on-foam:#D5EAFD; --on-matcha:#DDEFC0; --on-chai:#F4F6C9; --on-cafe:#EADBC8;
-  --good:#B7DA8C; --good-bg:#26391F; --warn:#FFC85A; --warn-bg:#3D2E12; --bad:#F4A9B6; --bad-bg:#4A2030;
-  --chart-line:#F9DDE0; --chart-area:rgba(169,207,123,.25); --chart-grid:#382F26; --chart-text:#ABA092;
-  --shadow:none; --glass:rgba(255,255,255,.07);
-  --a-din:#6FA864; --a-din-b:#22331D; --a-din-f:#C4E3B8; --a-tra:#C27A99; --a-tra-b:#3A1F2B; --a-tra-f:#F4C9D6;
-  --a-com:#A88463; --a-com-b:#33281F; --a-com-f:#EAD8C3; --a-ope:#A9CF7B; --a-ope-b:#2A3719; --a-ope-f:#D8EDB6; --a-ven:#FFB834; --a-ven-b:#3B2C0E; --a-ven-f:#FFDCA0}}
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --bg:#16110D; --surface:#211A14; --surface2:#2A221B; --ink:#F4F0E4; --ink2:#E2D6C6; --muted:#ABA092; --line:#382F26;
-  --accent:#F9DDE0; --label:#A9CF7B; --field:#1B1511;
-  --wine:#6A2D49; --cafe:#7A6047; --sky:#22364A; --sky-fg:#D5EAFD;
-  --t-fresa:#3A2330; --t-foam:#1F3346; --t-matcha:#26341A; --t-chai:#33331C; --t-cafe:#30261D; --t-mand:#3A2C10;
-  --on-fresa:#F9DDE0; --on-foam:#D5EAFD; --on-matcha:#DDEFC0; --on-chai:#F4F6C9; --on-cafe:#EADBC8;
-  --good:#B7DA8C; --good-bg:#26391F; --warn:#FFC85A; --warn-bg:#3D2E12; --bad:#F4A9B6; --bad-bg:#4A2030;
-  --chart-line:#F9DDE0; --chart-area:rgba(169,207,123,.25); --chart-grid:#382F26; --chart-text:#ABA092;
-  --shadow:none; --glass:rgba(255,255,255,.07);
-  --a-din:#6FA864; --a-din-b:#22331D; --a-din-f:#C4E3B8; --a-tra:#C27A99; --a-tra-b:#3A1F2B; --a-tra-f:#F4C9D6;
-  --a-com:#A88463; --a-com-b:#33281F; --a-com-f:#EAD8C3; --a-ope:#A9CF7B; --a-ope-b:#2A3719; --a-ope-f:#D8EDB6; --a-ven:#FFB834; --a-ven-b:#3B2C0E; --a-ven-f:#FFDCA0}
-
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
