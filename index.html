@@ -179,6 +179,7 @@ select.in{padding-right:6px}
 .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--muted);display:inline-block;flex:none}
 tr.sel .dot{border-color:var(--sky-fg);background:var(--sky-fg)}
 .neg{color:var(--bad)}
+.sub-h{margin:6px 0 -4px;padding-top:10px;border-top:1px solid var(--line);font:700 11px/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--label)}
 .scx{display:block;font:500 10.5px/1.2 var(--f-mono);color:var(--muted);text-align:right;margin-top:3px}
 tr.sel .scx{color:inherit;opacity:.8}
 .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
@@ -425,17 +426,22 @@ details.card[open]>summary{margin-bottom:12px}
         <label><span class="l">Cobro por evento ($)</span><input class="in num" type="number" min="0" step="100" data-k="evPrice" id="f-evPrice"></label>
         <label><span class="l">Descuento por comisión (%)</span><input class="in num" type="number" min="0" max="20" step="0.1" data-k="fee" id="f-fee"></label>
         <label><span class="l">Ventas nov a feb (% de lo normal)</span><input class="in num" type="number" min="30" max="150" step="5" data-k="winter" id="f-winter"></label>
+        <p class="sub-h wide">Postres</p>
+        <label><span class="l">Precio por postre ($)</span><input class="in num" type="number" min="0" step="1" data-k="dPrice" id="f-dPrice"></label>
+        <label><span class="l">Costo por postre ($)</span><input class="in num" type="number" min="0" step="1" data-k="dCost" id="f-dCost"></label>
+        <label class="wide"><span class="l">Postres que vende hoy el puesto (por día)</span><input class="in num" type="number" min="0" step="1" data-k="dCur" id="f-dCur" placeholder="0 si hoy no venden postres"></label>
         <p class="hint wide">Gasto extra: gasolina, mantenimiento, energía, piso y, cuando se cotice, el contador mensual. El descuento por comisión está calibrado para que la tabla coincida con la del PDF. El PDF menciona 80% en invierno, pero su tabla no lo aplica.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
         <div style="display:flex;justify-content:space-between"><span class="muted">Margen por vaso</span><strong class="num" data-o="gross"></strong></div>
         <div style="display:flex;justify-content:space-between"><span class="muted">Margen después de comisión</span><strong class="num" data-o="net"></strong></div>
+        <div style="display:flex;justify-content:space-between"><span class="muted">Margen por postre, después de comisión</span><strong class="num" data-o="dnet"></strong></div>
         <div style="display:flex;justify-content:space-between"><span class="muted">Utilidad por evento</span><strong class="num" data-o="evp"></strong></div>
       </div>
     </div>
     <div class="stack">
       <div class="card"><h3 style="margin-bottom:8px">Escenarios</h3>
-        <div class="tw"><table class="tbl" id="scTbl"><thead><tr><th>Escenario</th><th>Vasos al día (total)</th><th>Eventos/mes</th><th>Venta extra/mes</th><th>Utilidad extra/mes</th><th>Recupera etapa 1</th></tr></thead><tbody id="scBody"></tbody></table></div>
+        <div class="tw"><table class="tbl" id="scTbl"><thead><tr><th>Escenario</th><th>Vasos al día (total)</th><th>Postres al día (total)</th><th>Eventos/mes</th><th>Venta extra/mes</th><th>Utilidad extra/mes</th><th>Recupera etapa 1</th></tr></thead><tbody id="scBody"></tbody></table></div>
         <p class="hint" style="margin-top:8px"><span data-o="baseHint"></span> Toca un escenario para activarlo. Evento privado: 80 bebidas por $4,500 según el PDF.</p>
       </div>
       <div class="card"><h3 style="margin-bottom:4px">Utilidad extra al mes por escenario</h3><div id="chScen"></div></div>
@@ -443,7 +449,7 @@ details.card[open]>summary{margin-bottom:12px}
   </div>
   <div class="grid two" style="margin-top:14px">
     <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><svg class="ic" style="color:var(--label)"><use href="#i-bell"/></svg><h3>Regla de alarma</h3></div>
-      <p style="margin:0 0 12px">Si a los 2 meses la combi no vende al menos <strong class="num" data-o="alarmN">10</strong> vasos al día, se cambia de punto o se empujan eventos.</p>
+      <p style="margin:0 0 12px">Si a los 2 meses la combi no vende al menos <strong class="num" data-o="alarmN">10</strong> vasos al día<span data-o="alarmDes"></span>, se cambia de punto o se empujan eventos.</p>
       <div class="fields">
         <label class="wide"><span class="l">Vasos al día que vende la combi (después de 2 meses)</span><input class="in num" type="number" min="0" step="1" data-k="actual" id="f-actual" placeholder="Promedio real por día de venta"></label>
       </div>
@@ -593,7 +599,8 @@ function label(k){var i=S.startM-1+k-1;return MES[i%12]+" "+(S.startY+Math.floor
 
 var DEF={
  scenario:1, price:65, cost:22, fee:4.41, extra:5000, days:12, evQty:80, evPrice:4500, winter:100, imprev:0, current:"", actual:"",
- scen:[{n:"Conservador",cups:15,ev:0},{n:"Base",cups:35,ev:1},{n:"Optimista",cups:60,ev:3}],
+ scen:[{n:"Conservador",cups:15,ev:0,dx:0},{n:"Base",cups:35,ev:1,dx:0},{n:"Optimista",cups:60,ev:3,dx:0}],
+ dPrice:50, dCost:20, dCur:"",
  rate:10, share:50, startM:1, startY:2027,
  items:[
   {id:"combi",stage:1,name:"Combi del post",amt:54000,st:0,ic:"van",note:"Pagar a más tardar el 23 nov, después de la revisión."},
@@ -690,19 +697,20 @@ try{var raw=localStorage.getItem(KEY);if(raw)S=merge(JSON.parse(raw))}catch(e){}
 var M={};
 function calc(){
   var net=S.price*(1-S.fee/100)-S.cost; M.net=net; M.gross=S.price-S.cost; M.evp=S.evPrice-S.evQty*S.cost;
+  var dnet=S.dPrice*(1-S.fee/100)-S.dCost; M.dnet=dnet; function dd(sc){return num(sc.dx)*S.days*dnet}
   var b1=0,tot=0,paid=0,s2=0,s3=0,need=0;
   S.items.forEach(function(i){var a=num(i.amt);tot+=a;if(i.st)paid+=a;if(i.stage===1)b1+=a;if(i.stage===2)s2+=a;if(i.stage===3)s3+=a;if(i.stage>1&&!i.st)need+=a});
   var cv={1:0,2:0,3:0};S.items.forEach(function(i){cv[i.stage]=(cv[i.stage]||0)+Math.min(num(i.cov),num(i.amt))});M.cov=cv;M.covTot=cv[1]+cv[2]+cv[3];
   M.stage1=b1*(1+S.imprev/100); M.s2=s2; M.s3=s3; M.need23=need; M.allTot=tot; M.paid=paid;
-  M.eq=net>0?S.extra/(net*S.days):Infinity;
-  M.sc=S.scen.map(function(sc){var u=sc.cups*S.days*net+sc.ev*M.evp-S.extra;return {u:u,sales:sc.cups*S.days*S.price+sc.ev*S.evPrice,pb:u>0?M.stage1/u:Infinity}});
+  M.sc=S.scen.map(function(sc){var u=sc.cups*S.days*net+dd(sc)+sc.ev*M.evp-S.extra;return {u:u,sales:sc.cups*S.days*S.price+num(sc.dx)*S.days*S.dPrice+sc.ev*S.evPrice,pb:u>0?M.stage1/u:Infinity}});
   M.act=M.sc[S.scenario]; M.actSc=S.scen[S.scenario];
+  M.eq=net>0?Math.max(0,S.extra-dd(M.actSc))/(net*S.days):Infinity;
   var apo=0,prin=0; S.people.forEach(function(p){var a=num(p.amt);apo+=a;if(p.kind==="prestamo")prin+=a});
   M.apo=apo; M.prin=prin; M.loanTot=prin*(1+S.rate/100); M.gap=M.stage1-apo;
   M.rows=[]; var bL=M.loanTot,bS=M.need23,sc=M.actSc; M.loanDone=null; M.stDone=null;
   for(var k=1;k<=60;k++){
     var mi=(S.startM-1+k-1)%12, wf=WINTER.indexOf(mi)>=0?S.winter/100:1;
-    var u=sc.cups*S.days*net*wf+sc.ev*M.evp-S.extra, pos=Math.max(0,u), sL=pos*S.share/100, sS=pos-sL;
+    var u=sc.cups*S.days*net*wf+dd(sc)+sc.ev*M.evp-S.extra, pos=Math.max(0,u), sL=pos*S.share/100, sS=pos-sL;
     var pL=Math.min(bL,sL), pS=Math.min(bS,sS), lo=sL-pL, lo2=sS-pS;
     var aS=Math.min(bS-pS,lo); pS+=aS; var aL=Math.min(bL-pL,lo2); pL+=aL;
     bL-=pL; bS-=pS;
@@ -713,7 +721,7 @@ function calc(){
   }
   M.firstL=M.rows[0]?M.rows[0].pL:0;
 }
-function cumUtil(N){var out=[0],c=0,sc=M.actSc;for(var k=1;k<=N;k++){var mi=(S.startM-1+k-1)%12,wf=WINTER.indexOf(mi)>=0?S.winter/100:1;c+=sc.cups*S.days*M.net*wf+sc.ev*M.evp-S.extra;out.push(c)}return out}
+function cumUtil(N){var out=[0],c=0,sc=M.actSc;for(var k=1;k<=N;k++){var mi=(S.startM-1+k-1)%12,wf=WINTER.indexOf(mi)>=0?S.winter/100:1;c+=sc.cups*S.days*M.net*wf+num(sc.dx)*S.days*M.dnet+sc.ev*M.evp-S.extra;out.push(c)}return out}
 
 /* ---------- build static pieces ---------- */
 function buildSeg(){
@@ -731,8 +739,9 @@ function itemLi(i){
 var IHDR='<li class="line hdr" aria-hidden="true"><span></span><span>Concepto</span><div class="amts"><span>Costo</span><span>Cubierto</span></div><span class="hst">Estado</span><span></span></li>';
 function buildItems(){[1,2,3].forEach(function(st){var L=S.items.filter(function(i){return i.stage===st});$("#lines"+st).innerHTML=(L.length?IHDR:"")+L.map(itemLi).join("")})}
 function BASE(){return S.current===""?0:num(S.current)}
+function DBASE(){return S.dCur===""?0:num(S.dCur)}
 function buildScen(){
-  $("#scBody").innerHTML=S.scen.map(function(s,i){return '<tr data-sc="'+i+'"><td><button type="button" class="scbtn" data-act="scen" data-i="'+i+'"><span class="dot"></span>'+esc(s.n)+'</button></td><td><input class="in num" type="number" min="0" step="1" value="'+(BASE()+num(s.cups))+'" data-sc="'+i+'" data-f="tot" aria-label="Vasos al día en total, '+esc(s.n)+'"><small class="scx" data-o="scx'+i+'"></small></td><td><input class="in num" type="number" min="0" step="1" value="'+s.ev+'" data-sc="'+i+'" data-f="ev" aria-label="Eventos por mes, '+esc(s.n)+'"></td><td data-o="sc'+i+'s"></td><td data-o="sc'+i+'u"></td><td data-o="sc'+i+'p"></td></tr>'}).join("");
+  $("#scBody").innerHTML=S.scen.map(function(s,i){return '<tr data-sc="'+i+'"><td><button type="button" class="scbtn" data-act="scen" data-i="'+i+'"><span class="dot"></span>'+esc(s.n)+'</button></td><td><input class="in num" type="number" min="0" step="1" value="'+(BASE()+num(s.cups))+'" data-sc="'+i+'" data-f="tot" aria-label="Vasos al día en total, '+esc(s.n)+'"><small class="scx" data-o="scx'+i+'"></small></td><td><input class="in num" type="number" min="0" step="1" value="'+(DBASE()+num(s.dx))+'" data-sc="'+i+'" data-f="dtot" aria-label="Postres al día en total, '+esc(s.n)+'"><small class="scx" data-o="sdx'+i+'"></small></td><td><input class="in num" type="number" min="0" step="1" value="'+s.ev+'" data-sc="'+i+'" data-f="ev" aria-label="Eventos por mes, '+esc(s.n)+'"></td><td data-o="sc'+i+'s"></td><td data-o="sc'+i+'u"></td><td data-o="sc'+i+'p"></td></tr>'}).join("");
 }
 function buildPeople(){
   $("#pBody").innerHTML=S.people.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" aria-label="Nombre"></td><td><select class="in" data-p="'+p.id+'" data-f="kind" aria-label="Tipo de aportación"><option value="dueno"'+(p.kind==="dueno"?" selected":"")+'>Dueño, aporta</option><option value="prestamo"'+(p.kind==="prestamo"?" selected":"")+'>Préstamo</option></select></td><td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto de '+esc(p.name)+'"></label></td><td data-o="pt'+p.id+'"></td><td>'+(p.kind==="prestamo"?'<label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="100" value="'+num(p.paid)+'" data-p="'+p.id+'" data-f="paid" aria-label="Pagado a '+esc(p.name)+'"></label>':'—')+'</td><td><span data-o="pf'+p.id+'"></span><div class="bar sm pbar"><i id="pb'+p.id+'" style="width:0"></i></div></td><td data-o="pm'+p.id+'"></td><td data-o="pe'+p.id+'"></td><td><button type="button" class="x" data-act="delPerson" data-id="'+p.id+'" aria-label="Quitar">'+ic("x")+'</button></td></tr>'}).join("");
@@ -874,11 +883,12 @@ function render(){
   [[1,M.stage1],[2,M.s2],[3,M.s3]].forEach(function(x){var c=M.cov[x[0]]||0,pc=x[1]>0?Math.min(100,c/x[1]*100):0;setO("c"+x[0],fmt(c)+" de "+fmt(x[1])+" · "+Math.round(pc)+"%");$("#cb"+x[0]).style.width=pc+"%"});
   setO("gross",fmt(M.gross)+" por vaso"); setO("net","$"+f1(M.net)+" por vaso"); setO("evp",fmt(M.evp)); var B=BASE(), minT=B+alarm; setO("alarmN",String(minT)); setO("minTot",String(minT)); setO("minTot2",String(minT));
   setO("baseHint",S.current===""?"Falta anotar las ventas actuales del puesto (en Supuestos); por ahora se cuentan como 0, así que los totales solo muestran lo que la combi vende de más.":"Los totales incluyen los "+B+" vasos que ya vende el puesto.");
-  S.scen.forEach(function(sc,i){setO("scx"+i,"+"+num(sc.cups)+" vs puesto")});
+  S.scen.forEach(function(sc,i){setO("scx"+i,"+"+num(sc.cups)+" vs puesto");setO("sdx"+i,"+"+num(sc.dx)+" vs puesto")});
+  setO("dnet","$"+f1(M.dnet)+" por postre"); setO("alarmDes",num(M.actSc.dx)>0?" (además de "+(DBASE()+num(M.actSc.dx))+" postres al día)":"");
   // verdict
   var v=$("#verdict"), vt, vx, vs;
   if(A.u<=0){vs="bad";vt="Con este escenario no se cubre el gasto extra";vx="La utilidad extra es "+fmt(A.u)+" al mes. Hacen falta al menos "+(eqn===null?"más":f1(B+eqn))+" vasos al día en total, o eventos."}
-  else if(A.pb<=12){vs="good";vt="Viable: la etapa 1 se recupera en "+months(A.pb);vx="Vendiendo "+(B+num(M.actSc.cups))+" vasos al día y con "+M.actSc.ev+" evento(s) al mes, la utilidad extra es de "+fmt(A.u)+" al mes."}
+  else if(A.pb<=12){vs="good";vt="Viable: la etapa 1 se recupera en "+months(A.pb);vx="Vendiendo "+(B+num(M.actSc.cups))+" vasos"+(num(M.actSc.dx)||DBASE()?" y "+(DBASE()+num(M.actSc.dx))+" postres":"")+" al día y con "+M.actSc.ev+" evento(s) al mes, la utilidad extra es de "+fmt(A.u)+" al mes."}
   else if(A.pb<=24){vs="warn";vt="Viable a plazo largo: la etapa 1 se recupera en "+months(A.pb);vx="La utilidad extra es de "+fmt(A.u)+" al mes. Los eventos acortan el plazo."}
   else{vs="bad";vt="Se tarda "+months(A.pb)+" en recuperar la etapa 1";vx="Con "+fmt(A.u)+" de utilidad extra al mes el plazo es largo. Conviene empujar eventos o cambiar de punto."}
   v.dataset.s=vs; $("#vTitle").textContent=vt; $("#vText").textContent=vx;
@@ -886,7 +896,7 @@ function render(){
     kpi("k-wine","Etapa 1","van",fmt(M.stage1),"Combi y equipo"+(S.imprev?" con "+S.imprev+"% de imprevistos":""))+
     kpi("k-sky","Aportado","users",fmt(M.apo),M.gap>0.5?"Faltan "+fmt(M.gap)+" para la etapa 1":(M.gap<-0.5?"Sobran "+fmt(-M.gap):"Cubre la etapa 1"))+
     kpi("k-mint","Utilidad extra al mes","trend",fmt(A.u),"Escenario "+esc(M.actSc.n).toLowerCase())+
-    kpi("k-plain","Mínimo de venta","coin",(eqn===null?"—":f1(B+eqn))+" vasos/día",S.current===""?"Para cubrir el gasto extra. Falta sumar lo que vende el puesto":"Puesto ("+B+") + "+(eqn===null?"—":f1(eqn))+" para cubrir el gasto extra")+
+    kpi("k-plain","Mínimo de venta","coin",(eqn===null?"—":f1(B+eqn))+" vasos/día",(S.current===""?"Para cubrir el gasto extra. Falta sumar lo que vende el puesto":"Puesto ("+B+") + "+(eqn===null?"—":f1(eqn))+" para cubrir el gasto extra")+(num(M.actSc.dx)>0?", contando "+num(M.actSc.dx)+" postres extra al día":""))+
     kpi("k-lime","Recuperan etapa 1","cal",months(A.pb),"Utilidad extra contra "+fmt(M.stage1))+
     kpi("k-wine","Amigos reciben","return",fmt(M.loanTot),M.loanDone?"Se les paga en "+months(M.loanDone):(M.loanTot>0?"Más de 5 años con este ritmo":"Sin préstamos"));
   // scenarios
@@ -966,9 +976,9 @@ function startDb(){
 /* ---------- events ---------- */
 function setPath(el){
   var v=el.value;
-  if(el.dataset.k){var k=el.dataset.k;if(k==="current"||k==="actual")S[k]=v===""?"":num(v);else if(k==="startM")S[k]=parseInt(v,10);else S[k]=num(v)}
+  if(el.dataset.k){var k=el.dataset.k;if(k==="current"||k==="actual"||k==="dCur")S[k]=v===""?"":num(v);else if(k==="startM")S[k]=parseInt(v,10);else S[k]=num(v)}
   else if(el.dataset.item){var it=S.items.filter(function(i){return i.id===el.dataset.item})[0];if(it){var ff=el.dataset.f;it[ff]=(ff==="amt"||ff==="cov")?num(v):v;var cvl=el.closest(".line")&&el.closest(".line").querySelector(".money.cv");if(cvl)cvl.classList.toggle("full",num(it.cov)>=num(it.amt)&&num(it.amt)>0)}}
-  else if(el.dataset.sc!==undefined){var f_=el.dataset.f;if(f_==="tot")S.scen[+el.dataset.sc].cups=Math.max(0,num(v)-BASE());else S.scen[+el.dataset.sc][f_]=num(v)}
+  else if(el.dataset.sc!==undefined){var f_=el.dataset.f;if(f_==="tot")S.scen[+el.dataset.sc].cups=Math.max(0,num(v)-BASE());else if(f_==="dtot")S.scen[+el.dataset.sc].dx=Math.max(0,num(v)-DBASE());else S.scen[+el.dataset.sc][f_]=num(v)}
   else if(el.dataset.fe&&el.dataset.f==="n"){var fn=S.frentes.filter(function(x){return x.id===el.dataset.fe})[0];if(fn)fn.n=v}
   else if(el.dataset.idea){var id_=S.ideas.filter(function(x){return x.id===el.dataset.idea})[0];if(id_)id_.amt=num(v)}
   else if(el.dataset.fw){var fo=S.follow[el.dataset.fw]=S.follow[el.dataset.fw]||{};fo.who=v}
@@ -977,7 +987,7 @@ function setPath(el){
   else return false;
   return true;
 }
-document.addEventListener("input",function(e){var el=e.target;if(el.matches("input[type=number],input[type=text]")&&setPath(el)){if(el.dataset.k==="current")buildScen();changed()}});
+document.addEventListener("input",function(e){var el=e.target;if(el.matches("input[type=number],input[type=text]")&&setPath(el)){if(el.dataset.k==="current"||el.dataset.k==="dCur")buildScen();changed()}});
 document.addEventListener("change",function(e){var el=e.target;if(el.dataset&&el.dataset.ide){var dd=S.ideas.filter(function(x){return x.id===el.dataset.ide})[0];if(!dd)return;
     if(el.dataset.f==="t")dd.t=el.value.trim()||"Sin nombre";else dd.note=el.value.trim();
     var db_=$('.i-nm[data-act="ideaEdit"][data-id="'+dd.id+'"]');if(db_){db_.querySelector("span").firstChild.nodeValue=dd.t;var sm2=db_.querySelector("small");if(dd.note){if(!sm2){sm2=document.createElement("small");db_.appendChild(sm2)}sm2.textContent=dd.note}else if(sm2)sm2.remove()}
