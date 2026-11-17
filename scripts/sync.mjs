@@ -80,6 +80,13 @@ function buildICS(S) {
   return L.map(fold).join("\r\n") + "\r\n";
 }
 
+// ---------- tareas y actividades nuevas ----------
+function venceText(d, today, time) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d || "")) return "sin fecha";
+  const n = dayDiff(d, today), lab = dlab(d) + (time ? ", " + time : "");
+  return n > 1 ? `vence en ${n} días (${lab})` : n === 1 ? `vence mañana (${lab})` : n === 0 ? `vence hoy (${lab})` : `venció hace ${-n} ${-n === 1 ? "día" : "días"} (${lab})`;
+}
+
 // ---------- resumen diario (mismo criterio que la página) ----------
 function dailyBody(S, today, P) {
   const L = [], follow = S.follow || {};
@@ -123,12 +130,31 @@ async function main() {
       else console.log("Error al enviar a", sub.id, e.statusCode || e.message);
     }
   };
+  // Detecta tareas (recordatorios) y actividades nuevas desde la última corrida.
+  const firstRun = !state.known; state.known ||= { t: {}, f: {} };
+  const items = [...(S.todo || []).map((x) => ["t", x]), ...(S.frentes || []).map((x) => ["f", x])], fresh = [];
+  for (const [k, it] of items) {
+    if (!it || !it.id || state.known[k][it.id]) continue;
+    if (firstRun) { state.known[k][it.id] = 1; continue; }
+    if (it.at && now - it.at < 120e3) continue; // recién creada: se espera a que tenga nombre y fecha
+    fresh.push([k, it]); state.known[k][it.id] = 1;
+  }
+  for (const k of ["t", "f"]) { const ids = new Set(items.filter(([x]) => x === k).map(([, it]) => it.id)); for (const id of Object.keys(state.known[k])) if (!ids.has(id)) delete state.known[k][id]; }
+  console.log("Nuevas:", fresh.length);
+
   for (const sub of subs) {
     if (!sub.endpoint || !sub.keys) continue;
     const tz = sub.tz || DEF_TZ, P = { todo: true, fr: true, key: true, late: true, ...(sub.prefs || {}) };
     if (P.todo) for (const t of S.todo || []) {
       if (t.done || !t.due) continue; const at = zonedToUtc(t.due, tz);
       if (isFinite(at) && at <= now && now - at < 3 * 3600e3) await send(sub, { title: "Recordatorio · Café Frío", body: `${t.t} (${dueLab(t.due)})`, tag: "todo-" + t.id, url: "./#inicio" }, `todo:${sub.id}:${t.id}:${t.due}`);
+    }
+    if (P.nuevo !== false) for (const [k, it] of fresh) {
+      if (it.by && P.dev && it.by === P.dev) continue; // no avisar a quien la agregó
+      if (k === "t" && it.done) continue;
+      const td = localDate(now, tz);
+      const body = k === "t" ? `Se agregó tarea: ${it.t} · ${venceText(String(it.due || "").slice(0, 10), td, String(it.due || "").slice(11, 16))}` : `Se agregó actividad: ${it.n} · ${venceText(it.e, td)}`;
+      await send(sub, { title: k === "t" ? "Nueva tarea · Café Frío" : "Nueva actividad · Café Frío", body, tag: "new-" + it.id, url: k === "t" ? "./#inicio" : "./#calendario" }, `new:${sub.id}:${it.id}`);
     }
     const today = localDate(now, tz), [hh, mm] = String(sub.hour || "09:00").split(":").map(Number);
     if (localMinutes(now, tz) >= (hh || 0) * 60 + (mm || 0)) {

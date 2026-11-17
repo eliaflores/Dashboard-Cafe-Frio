@@ -832,6 +832,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Actividades del calendario</b><small>Las que empiezan o terminan ese día</small></span><input type="checkbox" class="sw" data-nf="fr"></label>
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Fechas clave</b><small>3 días antes, un día antes y el mismo día</small></span><input type="checkbox" class="sw" data-nf="key"></label>
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Atrasadas</b><small>Actividades que ya pasaron su fecha</small></span><input type="checkbox" class="sw" data-nf="late"></label>
+          <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Tareas y actividades nuevas</b><small>Cuando alguien del equipo agrega una, con su fecha</small></span><input type="checkbox" class="sw" data-nf="nuevo"></label>
           <div class="set-row"><span class="set-m"><b>Probar</b><small>Envía una notificación de prueba</small></span><button class="btn ghost" type="button" data-act="nfTest">Probar</button></div>
         </div>
         <p class="hint" style="margin-top:10px">Con los avisos activados llegan aunque la página esté cerrada (pueden tardar hasta unos 15 a 30 minutos). En iPhone primero agrégala a la pantalla de inicio (Compartir → Agregar a inicio) y actívalos desde ese ícono.</p>
@@ -953,6 +954,7 @@ function dt(iso){var p=String(iso||"").split("-");if(p.length!==3)return today()
 function isoOf(t){var d=new Date(t);return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 function addDays(t,n){var d=new Date(t);d.setDate(d.getDate()+n);return d.getTime()}
 function dayDiff(a,b){return Math.round((a-b)/DAY)}
+var DEVID=(function(){try{var d=localStorage.getItem("cafefrio-dev");if(!d){d="d"+Math.random().toString(36).slice(2,10);localStorage.setItem("cafefrio-dev",d)}return d}catch(e){return "d0"}})();
 function dtt(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime():NaN}
 function dueLab(v){var t=dtt(v);if(!isFinite(t))return "";var d=new Date(t),n=dayDiff(new Date(t).setHours(0,0,0,0),today());return (n===0?"Hoy":n===1?"Mañana":n===-1?"Ayer":d.getDate()+" "+MESC[d.getMonth()])+" · "+pad(d.getHours())+":"+pad(d.getMinutes())}
 function dlab(iso){var d=new Date(dt(iso));return d.getDate()+" "+MESC[d.getMonth()]}
@@ -1265,7 +1267,7 @@ function fillSheet(){
 }
 function openSheet(id,focus){shId=id;fillSheet();$("#fSheet").hidden=false;if(focus){var n=$("#sh-n");n.focus();n.select()}}
 function closeSheet(){shId=null;$("#fSheet").hidden=true}
-function addFrente(iso){var t=dt(iso),nf={id:"f"+uid(),n:"Nueva actividad",a:"ope",s:isoOf(t),e:isoOf(addDays(t,6)),k:0};S.frentes.push(nf);changed();openSheet(nf.id,true)}
+function addFrente(iso){var t=dt(iso),nf={id:"f"+uid(),n:"Nueva actividad",a:"ope",s:isoOf(t),e:isoOf(addDays(t,6)),k:0,by:DEVID,at:Date.now()};S.frentes.push(nf);changed();openSheet(nf.id,true)}
 
 /* ---------- gráficas ---------- */
 function niceStep(r){if(r<=0)return 1;var p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p}
@@ -1447,7 +1449,7 @@ function importData(file){
 if(window.matchMedia){try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyTheme)}catch(e){}}
 
 /* ---------- notificaciones ---------- */
-var NFKEY="cafefrio-nf-sent", NF_DEF={on:false,hour:"09:00",todo:true,fr:true,key:true,late:true};
+var NFKEY="cafefrio-nf-sent", NF_DEF={on:false,hour:"09:00",todo:true,fr:true,key:true,late:true,nuevo:true};
 UI.nf=Object.assign({},NF_DEF,UI.nf||{});
 var swReg=null;
 function nfSupported(){return "Notification" in window}
@@ -1516,6 +1518,23 @@ function icsExport(){
   a.href=URL.createObjectURL(blob); a.download="cafe-frio-calendario.ics"; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},800);
 }
 
+/* ---------- aviso de tareas y actividades nuevas ---------- */
+var gotRemote=false, pendingNew={};
+function venceTxt(d,time){if(!/^\d{4}-\d{2}-\d{2}$/.test(d||""))return "sin fecha";var n=dayDiff(dt(d),today()),lab=dlab(d)+(time?", "+time:"");
+  return n>1?"vence en "+n+" días ("+lab+")":n===1?"vence mañana ("+lab+")":n===0?"vence hoy ("+lab+")":"venció hace "+(-n)+(n===-1?" día":" días")+" ("+lab+")"}
+function newItemText(k,it){return k==="t"?"Se agregó tarea: "+it.t+" · "+venceTxt(String(it.due||"").slice(0,10),String(it.due||"").slice(11,16)):"Se agregó actividad: "+it.n+" · "+venceTxt(it.e)}
+function queueNew(k,id){
+  if(pendingNew[k+id])return;
+  pendingNew[k+id]=setTimeout(function(){
+    delete pendingNew[k+id];
+    var it=find(k==="t"?S.todo:S.frentes,id); if(!it||(k==="t"&&it.done))return;
+    if(!UI.nf.on||UI.nf.nuevo===false||nfPerm()!=="granted")return;
+    var sent=sentLog(),key="new:"+id; if(sent[key])return;
+    notify(k==="t"?"Nueva tarea · Café Frío":"Nueva actividad · Café Frío",newItemText(k,it),"new-"+id,k==="t"?"#inicio":"#calendario");
+    sent[key]=Date.now(); saveSent(sent);
+  },45000);
+}
+
 /* ---------- avisos en segundo plano (push) y suscripción de calendario ---------- */
 var VAPID_PUBLIC="BFmjQF89Yh_mqMJGbP3efu8Dw74fwRG22fAanPdPbqVGoEpGxYyuQ2JA1pnVSQfla8qdUjGPJErdHARzOE1G4EI", fbApp=null;
 function b64u(s){var b=(s+"===".slice((s.length+3)%4)).replace(/-/g,"+").replace(/_/g,"/"),r=atob(b),o=new Uint8Array(r.length);for(var i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
@@ -1529,7 +1548,7 @@ function pushSync(){
     return r.pushManager.getSubscription().then(function(sub){return sub||r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUBLIC)})});
   }).then(function(sub){
     var j=sub.toJSON(), id="s"+hashStr(j.endpoint), P=UI.nf;
-    return fbApp.firestore().collection("subs").doc(id).set({endpoint:j.endpoint,keys:{p256dh:j.keys.p256dh,auth:j.keys.auth},tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||"America/Chihuahua"),hour:P.hour||"09:00",prefs:{todo:!!P.todo,fr:!!P.fr,key:!!P.key,late:!!P.late},ua:navigator.userAgent.slice(0,120),updated:Date.now()}).then(function(){UI.nf.subId=id;UI.nf.pushSt="ok";saveUI();nfRender()});
+    return fbApp.firestore().collection("subs").doc(id).set({endpoint:j.endpoint,keys:{p256dh:j.keys.p256dh,auth:j.keys.auth},tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||"America/Chihuahua"),hour:P.hour||"09:00",prefs:{todo:!!P.todo,fr:!!P.fr,key:!!P.key,late:!!P.late,nuevo:P.nuevo!==false,dev:DEVID},ua:navigator.userAgent.slice(0,120),updated:Date.now()}).then(function(){UI.nf.subId=id;UI.nf.pushSt="ok";saveUI();nfRender()});
   }).catch(function(e){UI.nf.pushSt=(e&&e.code==="permission-denied")?"rules":"error";saveUI();nfRender()});
 }
 function pushOff(){
@@ -1575,9 +1594,12 @@ function listen(doc){
     if(exists){var d=snap.data();
       if(d&&d.state&&d.rev&&d.rev!==myRev&&!snap.metadata.hasPendingWrites&&Date.now()-lastEdit>2500){
         var wasOld=!(d.state.ver>=DEF.ver);
-        S=merge(d.state);myRev=d.rev;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}buildAll();render();
+        var pT={},pF={};S.todo.forEach(function(x){pT[x.id]=1});S.frentes.forEach(function(x){pF[x.id]=1});
+        S=merge(d.state);myRev=d.rev;
+        if(gotRemote){S.todo.forEach(function(x){if(!pT[x.id]&&x.by!==DEVID)queueNew("t",x.id)});S.frentes.forEach(function(x){if(!pF[x.id]&&x.by!==DEVID)queueNew("f",x.id)})}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}buildAll();render();
         if(wasOld&&canWrite)flush(); // sube la versión actualizada para todos
       }
+      if(!snap.metadata.fromCache)gotRemote=true;
       if(!writing&&!snap.metadata.fromCache)status("ok","Guardado para todos")}
     else if(!snap.metadata.fromCache&&first){first=false;flush()} // primera vez: sube lo que hay en este navegador
   },function(e){clearTimeout(t);canWrite=false;status("local",e&&e.code==="permission-denied"?"Sin permiso en la base de datos":"Solo en este dispositivo")});
@@ -1684,7 +1706,7 @@ document.addEventListener("click",function(e){
   else if(a==="ideaSt"){var is_=find(S.ideas,id);if(is_){is_.st=(is_.st+1)%4;buildIdeas();changed()}}
   else if(a==="ideaDel"){var dl=find(S.ideas,id);if(dl&&confirm('¿Eliminar "'+dl.t+'"?')){S.ideas=S.ideas.filter(function(x){return x.id!==id});dEditing=null;buildIdeas();changed()}}
   else if(a==="delTodo"){S.todo=S.todo.filter(function(t){return t.id!==id});buildTodos();changed()}
-  else if(a==="addTodo"){var tn=$("#todoName").value.trim();if(tn){S.todo.unshift({id:uid(),t:tn,done:false,due:$("#todoDue").value||""});$("#todoName").value="";$("#todoDue").value="";buildTodos();changed()}}
+  else if(a==="addTodo"){var tn=$("#todoName").value.trim();if(tn){S.todo.unshift({id:uid(),t:tn,done:false,due:$("#todoDue").value||"",by:DEVID,at:Date.now()});$("#todoName").value="";$("#todoDue").value="";buildTodos();changed()}}
 });
 document.addEventListener("keydown",function(e){var t=e.target,d=t.dataset||{};
   if(e.key==="Escape"){if(shId)closeSheet();$("#calSheet").hidden=true;closeMenu();return}
