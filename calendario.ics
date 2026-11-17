@@ -12,7 +12,7 @@ BEGIN:VEVENT
 UID:frente-f1@cafefrio
 DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261110
-DTEND;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261117
 SUMMARY:✓ Comprar Cafetera
 DESCRIPTION:Área: Decisiones y dinero. Hecho. Ver: https://eliaflores.gi
  thub.io/Dashboard-Cafe-Frio/#calendario
@@ -36,8 +36,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:frente-f4@cafefrio
 DTSTAMP:20260101T000000Z
-DTSTART;VALUE=DATE:20261130
-DTEND;VALUE=DATE:20261208
+DTSTART;VALUE=DATE:20261123
+DTEND;VALUE=DATE:20261129
 SUMMARY:Conseguir y hacer Sistema hidraulica Autonomo
 DESCRIPTION:Área: Decisiones y dinero. Ver: https://eliaflores.github.io
  /Dashboard-Cafe-Frio/#calendario
@@ -66,11 +66,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:frente-f7@cafefrio
 DTSTAMP:20260101T000000Z
-DTSTART;VALUE=DATE:20261214
-DTEND;VALUE=DATE:20261221
+DTSTART;VALUE=DATE:20261114
+DTEND;VALUE=DATE:20261121
 SUMMARY:Batidora KintchenAId
-DESCRIPTION:Área: Trámites. Ver: https://eliaflores.github.io/Dashboard
- -Cafe-Frio/#calendario
+DESCRIPTION:Área: Equipo e instalación. Ver: https://eliaflores.github.
+ io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -221,7 +221,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:frente-f0g9fpg@cafefrio
 DTSTAMP:20260101T000000Z
-DTSTART;VALUE=DATE:20261116
+DTSTART;VALUE=DATE:20261129
 DTEND;VALUE=DATE:20261130
 SUMMARY:Firmar carta Joaquin y Maggie
 DESCRIPTION:Área: Operación. Responsable: Joaquin Maggie. Ver: https://
