@@ -710,7 +710,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
     <div class="card">
       <div class="cal-top">
         <div class="cal-nav"><button class="ib" type="button" data-act="calPrev" aria-label="Mes anterior">‹</button><h3 id="calTitle"></h3><button class="ib" type="button" data-act="calNext" aria-label="Mes siguiente">›</button></div>
-        <div style="display:flex;gap:8px"><button class="btn ghost" type="button" data-act="calAll" id="calAllBtn">Ver todas</button><button class="btn ghost" type="button" data-act="calToday">Hoy</button></div>
+        <button class="btn ghost" type="button" data-act="calToday">Hoy</button>
       </div>
       <div class="leg" id="gLeg"></div>
       <div class="cal" id="cal"></div>
@@ -1236,12 +1236,12 @@ function buildCal(){
   var h='<div class="cal-dow">'+["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map(function(d){return '<span>'+(mob?d.charAt(0):d)+'</span>'}).join("")+'</div>';
   var ab=$("#calAllBtn"); if(ab)ab.textContent=UI.calAll?"Ver menos":"Ver todas";
   for(var ws=monthStart(calY,calM);ws<=last;ws=addDays(ws,7)){
-    var we=addDays(ws,6), wk=isoOf(ws), open=!!(UI.calAll||calExp[wk]); MAXL=open?999:MAX0;
+    var we=addDays(ws,6), wk=isoOf(ws), open=true; MAXL=999;
     var evs=S.frentes.filter(function(f){return dt(f.s)<=we&&dt(f.e)>=ws}).map(function(f){return {f:f,si:Math.max(0,dayDiff(dt(f.s),ws)),ei:Math.min(6,dayDiff(dt(f.e),ws))}});
     evs.sort(function(a,b){return a.si-b.si||(b.ei-b.si)-(a.ei-a.si)});
     var lanes=[], over=[0,0,0,0,0,0,0];
     evs.forEach(function(ev){var L=0;while(L<lanes.length&&lanes[L]>=ev.si)L++;lanes[L]=ev.ei;ev.L=L;if(L>=MAXL)for(var i=ev.si;i<=ev.ei;i++)over[i]++});
-    var nl=Math.min(lanes.length,MAXL), hasOver=over.some(function(x){return x>0}), canLess=open&&!UI.calAll&&lanes.length>MAX0;
+    var nl=Math.min(lanes.length,MAXL), hasOver=over.some(function(x){return x>0}), canLess=false;
     h+='<div class="cal-wk" style="grid-template-rows:'+(mob?26:32)+'px'+(nl?' repeat('+nl+',var(--evh))':'')+(hasOver||canLess?' 20px':'')+' minmax(4px,1fr)">';
     for(var i=0;i<7;i++){var t=addDays(ws,i),iso=isoOf(t),d=new Date(t);
       h+='<button type="button" class="cal-d'+(d.getMonth()!==calM?" out":"")+(t===T?" today":"")+(iso===selDay?" sel":"")+(i>4?" we":"")+'" style="grid-column:'+(i+1)+'" data-act="calDay" data-d="'+iso+'" aria-label="'+d.getDate()+' de '+MESL[d.getMonth()]+'"><span class="dn">'+d.getDate()+'</span></button>'}
