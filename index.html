@@ -446,6 +446,15 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 .set-h{font:700 11px/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 10px}
 .set-h:first-of-type{margin-top:4px}
 .tb-set{margin-left:2px}
+.toast{position:fixed;z-index:90;left:50%;top:calc(12px + env(safe-area-inset-top,0px));width:min(460px,calc(100% - 24px));transform:translate(-50%,-160%);transition:transform .3s ease;background:var(--surface);color:var(--ink);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.22);padding:12px 12px 12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.toast.show{transform:translate(-50%,0)}
+.toast img{width:40px;height:40px;border-radius:50%;flex:none}
+.toast .um b{white-space:normal}.toast .um small{white-space:normal}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+.diag{list-style:none;margin:8px 0 0;padding:12px 14px;border-radius:16px;background:var(--surface2);display:flex;flex-direction:column;gap:7px;font-size:13.5px}
+.diag li{display:flex;gap:8px;align-items:flex-start}
+.diag li b{flex:none;width:18px;text-align:center}
+.diag li.ok b{color:var(--good)} .diag li.no b{color:var(--bad)}
 .refresh-btn{display:flex;align-items:center;gap:12px;width:100%;margin-top:4px;padding:11px 14px;border:0;border-radius:14px;background:none;color:var(--ink2);font-size:15px;font-weight:500;text-align:left}
 .refresh-btn:hover{background:var(--surface2)}
 .spin .ic{animation:spin .8s linear infinite}
@@ -846,6 +855,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
       <div class="card">
         <div class="card-h"><h3>Notificaciones</h3><span class="chip">Solo este dispositivo</span></div>
         <div class="set-row"><span class="set-ic" style="--b:var(--t-mand);--c:var(--on-chai)"><svg class="ic"><use href="#i-bell"/></svg></span><span class="set-m"><b>Avisos en este dispositivo</b><small id="nfState"></small></span><button class="btn" type="button" data-act="nfOn" id="nfBtn">Activar</button></div>
+        <ul class="diag" id="nfDiag"></ul>
         <div id="nfOpts">
           <div class="set-row"><span class="set-m"><b>Resumen diario</b><small>Qué empieza, qué termina, fechas clave y atrasos del día</small></span><input class="in" type="time" id="nfHour" style="width:150px" aria-label="Hora del resumen diario"></div>
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Recordatorios con hora</b><small>Avisa a la hora que les pongas</small></span><input type="checkbox" class="sw" data-nf="todo"></label>
@@ -914,6 +924,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 </div>
 
 <nav class="bnav" id="bnav" aria-label="Secciones"></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"><img src="assets/icon-192.png" alt=""><span class="um"><b id="toastT"></b><small id="toastB"></small></span><button class="x" type="button" data-act="toastClose" aria-label="Cerrar aviso"><svg class="ic"><use href="#i-x"/></svg></button></div>
 
 <!-- hoja para sincronizar con apps de calendario -->
 <div class="sheet-bg" id="calSheet" hidden>
@@ -1491,7 +1502,13 @@ function nfPerm(){return nfSupported()?Notification.permission:"unsupported"}
 function registerSW(){if(!("serviceWorker" in navigator)||!/^https?:/.test(location.protocol))return Promise.resolve(null);return navigator.serviceWorker.register("sw.js").then(function(r){swReg=r;return r}).catch(function(){return null})}
 function sentLog(){try{return JSON.parse(localStorage.getItem(NFKEY)||"{}")}catch(e){return {}}}
 function saveSent(o){var lim=Date.now()-40*DAY;Object.keys(o).forEach(function(k){if(o[k]<lim)delete o[k]});try{localStorage.setItem(NFKEY,JSON.stringify(o))}catch(e){}}
+var toastTimer=null, toastHash="";
+function toast(title,body,hash){
+  var t=$("#toast"); if(!t)return; $("#toastT").textContent=title; $("#toastB").textContent=body; toastHash=hash||"";
+  t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove("show")},7000);
+}
 function notify(title,body,tag,hash){
+  if(document.visibilityState==="visible")toast(title,body,hash);
   if(nfPerm()!=="granted")return;
   var opt={body:body,tag:tag,icon:"assets/icon-192.png",badge:"assets/icon-192.png",data:{url:"./"+(hash||"#inicio")}};
   var go=function(r){if(r&&r.showNotification)return r.showNotification(title,opt);try{var n=new Notification(title,opt);n.onclick=function(){window.focus();if(hash)location.hash=hash;n.close()}}catch(e){}};
@@ -1517,7 +1534,17 @@ function nfCheck(){
   }
   if(ch)saveSent(sent);
 }
+function nfDiag(){
+  var el=$("#nfDiag"); if(!el)return;
+  var ios=/iPhone|iPad|iPod/.test(navigator.userAgent), app=!!(navigator.standalone||(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)), p=nfPerm(), P=UI.nf;
+  var L=[];
+  if(ios)L.push([app,app?"Abierta desde el ícono de la pantalla de inicio":"Ábrela desde el ícono de la pantalla de inicio (Compartir → Agregar a inicio)"]);
+  L.push([p==="granted"&&P.on,p==="granted"&&P.on?"Notificaciones activadas en este dispositivo":p==="denied"?"El navegador bloqueó las notificaciones de esta página":"Toca Activar para dar permiso"]);
+  L.push([P.pushSt==="ok",P.pushSt==="ok"?"Registrado para avisos con la página cerrada":P.pushSt==="rules"?"Falta actualizar las reglas de Firebase para avisos con la página cerrada":P.pushSt==="nosupport"?"Este navegador solo avisa con la página abierta":"Aún no registrado para avisos con la página cerrada"]);
+  el.innerHTML=L.map(function(x){return '<li class="'+(x[0]?"ok":"no")+'"><b>'+(x[0]?"✓":"✗")+'</b><span>'+x[1]+'</span></li>'}).join("");
+}
 function nfRender(){
+  nfDiag();
   var p=nfPerm(), P=UI.nf, st=$("#nfState"), btn=$("#nfBtn"); if(!st)return;
   if(p==="unsupported"){st.textContent="Este navegador no permite notificaciones. En iPhone, abre la página desde la pantalla de inicio.";btn.hidden=true}
   else if(p==="denied"){st.textContent="Bloqueadas en el navegador. Permítelas en los ajustes del sitio y vuelve a intentar.";btn.hidden=true}
@@ -1560,8 +1587,9 @@ function newItemText(k,it){return k==="t"?"Se agregó tarea: "+it.t+" · "+vence
 function fireNew(k,id){
   if(pendingNew[k+id]){clearTimeout(pendingNew[k+id]);delete pendingNew[k+id]}
   var it=find(k==="t"?S.todo:S.frentes,id); if(!it||(k==="t"&&it.done))return;
-  if(!UI.nf.on||UI.nf.nuevo===false||nfPerm()!=="granted")return;
   var sent=sentLog(),key="new:"+id; if(sent[key])return;
+  var tt=k==="t"?"Nueva tarea · Café Frío":"Nueva actividad · Café Frío", hh=k==="t"?"#inicio":"#calendario";
+  if(!UI.nf.on||UI.nf.nuevo===false||nfPerm()!=="granted"){if(document.visibilityState==="visible")toast(tt,newItemText(k,it),hh);sent[key]=Date.now();saveSent(sent);return}
   notify(k==="t"?"Nueva tarea · Café Frío":"Nueva actividad · Café Frío",newItemText(k,it),"new-"+id,k==="t"?"#inicio":"#calendario");
   sent[key]=Date.now(); saveSent(sent);
 }
@@ -1700,6 +1728,7 @@ document.addEventListener("change",function(e){var el=e.target,d=el.dataset||{};
 document.addEventListener("click",function(e){
   if(e.target.id==="fSheet"){closeSheet();return}
   if(e.target.id==="calSheet"){$("#calSheet").hidden=true;return}
+  if(e.target.closest&&e.target.closest("#toast")&&!e.target.closest("[data-act]")){$("#toast").classList.remove("show");if(toastHash)location.hash=toastHash;return}
   if(e.target.id==="scrim"){closeMenu();return}
   var b=e.target.closest("[data-act]");if(!b||b.tagName==="INPUT")return;
   var a=b.dataset.act,id=b.dataset.id;
@@ -1725,6 +1754,7 @@ document.addEventListener("click",function(e){
   else if(a==="todoMore"){todoAll=!todoAll;buildTodos()}
   else if(a==="refresh"){refreshApp()}
   else if(a==="nfOn"){nfEnable()}
+  else if(a==="toastClose"){e.stopPropagation();$("#toast").classList.remove("show")}
   else if(a==="nfOff"){UI.nf.on=false;pushOff();saveUI();nfRender()}
   else if(a==="csOpen"){csOpen()}
   else if(a==="csClose"){$("#calSheet").hidden=true}
@@ -1748,7 +1778,7 @@ document.addEventListener("click",function(e){
   else if(a==="ideaSt"){var is_=find(S.ideas,id);if(is_){is_.st=(is_.st+1)%4;buildIdeas();changed()}}
   else if(a==="ideaDel"){var dl=find(S.ideas,id);if(dl&&confirm('¿Eliminar "'+dl.t+'"?')){S.ideas=S.ideas.filter(function(x){return x.id!==id});dEditing=null;buildIdeas();changed()}}
   else if(a==="delTodo"){S.todo=S.todo.filter(function(t){return t.id!==id});buildTodos();changed()}
-  else if(a==="addTodo"){var tn=$("#todoName").value.trim();if(tn){var nid=uid();S.todo.unshift({id:nid,t:tn,done:false,due:$("#todoDue").value||"",by:DEVID,at:Date.now()});queueNew("t",nid,4000);$("#todoName").value="";$("#todoDue").value="";buildTodos();changed()}}
+  else if(a==="addTodo"){var tn=$("#todoName").value.trim();if(tn){var nid=uid();S.todo.unshift({id:nid,t:tn,done:false,due:$("#todoDue").value||"",by:DEVID,at:Date.now()});queueNew("t",nid,300);$("#todoName").value="";$("#todoDue").value="";buildTodos();changed()}}
 });
 document.addEventListener("keydown",function(e){var t=e.target,d=t.dataset||{};
   if(e.key==="Escape"){if(shId)closeSheet();$("#calSheet").hidden=true;closeMenu();return}

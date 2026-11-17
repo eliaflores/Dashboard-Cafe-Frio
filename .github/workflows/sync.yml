@@ -1,10 +1,10 @@
 name: Calendario y avisos
 
-# Cada 15 minutos: actualiza calendario.ics (suscripción de calendario) y manda las
+# Cada 15 minutos (en minutos poco concurridos, para que GitHub no la salte): actualiza calendario.ics (suscripción de calendario) y manda las
 # notificaciones push de recordatorios y del resumen diario. GitHub puede retrasar unos minutos cada corrida.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
