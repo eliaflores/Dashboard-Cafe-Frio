@@ -492,6 +492,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 .cal-ev.late{outline:1.5px solid var(--bad);outline-offset:-1.5px}
 .cal-more{position:relative;z-index:1;border:0;background:none;font:600 10.5px/16px var(--f-mono);color:var(--muted);text-align:left;padding:0 7px}
 .cal-more:hover{color:var(--ink)}
+.cal-more.less{text-align:center}
 .day-card h3{font:600 18px/1.2 var(--f-display);margin:0 0 4px}
 .fr{display:flex;align-items:center;gap:12px;width:100%;padding:10px 8px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:inherit;border-radius:0}
 .fr:first-child{border-top:0}
@@ -709,7 +710,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
     <div class="card">
       <div class="cal-top">
         <div class="cal-nav"><button class="ib" type="button" data-act="calPrev" aria-label="Mes anterior">‹</button><h3 id="calTitle"></h3><button class="ib" type="button" data-act="calNext" aria-label="Mes siguiente">›</button></div>
-        <button class="btn ghost" type="button" data-act="calToday">Hoy</button>
+        <div style="display:flex;gap:8px"><button class="btn ghost" type="button" data-act="calAll" id="calAllBtn">Ver todas</button><button class="btn ghost" type="button" data-act="calToday">Hoy</button></div>
       </div>
       <div class="leg" id="gLeg"></div>
       <div class="cal" id="cal"></div>
@@ -1227,24 +1228,27 @@ function when(f){return f.s===f.e?dlab(f.s):dlab(f.s)+" – "+dlab(f.e)}
 function frRow(f){var o=S.follow[f.id]||{};
   return '<button type="button" class="fr" data-act="fOpen" data-id="'+f.id+'"><i style="background:'+area(f).c+';--b:'+area(f).b+'"></i><span class="fr-m"><b>'+(f.k?"◆ ":"")+esc(f.n)+'</b><small>'+when(f)+(o.who?" · "+esc(o.who):"")+'</small></span>'+stChip(fst(f))+'</button>'}
 function monthStart(y,m){var f=new Date(y,m,1).getTime();return addDays(f,-((new Date(f).getDay()+6)%7))}
+var calExp={};
 function buildCal(){
-  var mob=window.innerWidth<640, MAXL=mob?3:4, T=today(), last=new Date(calY,calM+1,0).getTime();
+  var mob=window.innerWidth<640, MAX0=mob?3:4, MAXL=MAX0, T=today(), last=new Date(calY,calM+1,0).getTime();
   $("#calTitle").textContent=MESL[calM]+" "+calY;
   $("#gLeg").innerHTML=Object.keys(AREAS).map(function(k){return '<span><i style="background:'+AREAS[k].c+'"></i>'+esc(aName(k))+'</span>'}).join("")+'<span>◆ Fecha clave</span>';
   var h='<div class="cal-dow">'+["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map(function(d){return '<span>'+(mob?d.charAt(0):d)+'</span>'}).join("")+'</div>';
+  var ab=$("#calAllBtn"); if(ab)ab.textContent=UI.calAll?"Ver menos":"Ver todas";
   for(var ws=monthStart(calY,calM);ws<=last;ws=addDays(ws,7)){
-    var we=addDays(ws,6);
+    var we=addDays(ws,6), wk=isoOf(ws), open=!!(UI.calAll||calExp[wk]); MAXL=open?999:MAX0;
     var evs=S.frentes.filter(function(f){return dt(f.s)<=we&&dt(f.e)>=ws}).map(function(f){return {f:f,si:Math.max(0,dayDiff(dt(f.s),ws)),ei:Math.min(6,dayDiff(dt(f.e),ws))}});
     evs.sort(function(a,b){return a.si-b.si||(b.ei-b.si)-(a.ei-a.si)});
     var lanes=[], over=[0,0,0,0,0,0,0];
     evs.forEach(function(ev){var L=0;while(L<lanes.length&&lanes[L]>=ev.si)L++;lanes[L]=ev.ei;ev.L=L;if(L>=MAXL)for(var i=ev.si;i<=ev.ei;i++)over[i]++});
-    var nl=Math.min(lanes.length,MAXL), hasOver=over.some(function(x){return x>0});
-    h+='<div class="cal-wk" style="grid-template-rows:'+(mob?26:32)+'px'+(nl?' repeat('+nl+',var(--evh))':'')+(hasOver?' 18px':'')+' minmax(4px,1fr)">';
+    var nl=Math.min(lanes.length,MAXL), hasOver=over.some(function(x){return x>0}), canLess=open&&!UI.calAll&&lanes.length>MAX0;
+    h+='<div class="cal-wk" style="grid-template-rows:'+(mob?26:32)+'px'+(nl?' repeat('+nl+',var(--evh))':'')+(hasOver||canLess?' 20px':'')+' minmax(4px,1fr)">';
     for(var i=0;i<7;i++){var t=addDays(ws,i),iso=isoOf(t),d=new Date(t);
       h+='<button type="button" class="cal-d'+(d.getMonth()!==calM?" out":"")+(t===T?" today":"")+(iso===selDay?" sel":"")+(i>4?" we":"")+'" style="grid-column:'+(i+1)+'" data-act="calDay" data-d="'+iso+'" aria-label="'+d.getDate()+' de '+MESL[d.getMonth()]+'"><span class="dn">'+d.getDate()+'</span></button>'}
     evs.forEach(function(ev){if(ev.L>=MAXL)return;var f=ev.f,A=area(f),st=fst(f);
       h+='<button type="button" class="cal-ev'+(st===2?" done":"")+(st==="late"?" late":"")+(dt(f.s)<ws?" cl":"")+(dt(f.e)>we?" cr":"")+'" style="--c:'+A.c+';--b:'+A.b+';--cf:'+A.f+';grid-column:'+(ev.si+1)+'/'+(ev.ei+2)+';grid-row:'+(ev.L+2)+'" data-act="fOpen" data-id="'+f.id+'" title="'+esc(f.n)+' · '+when(f)+'">'+(f.k?"◆ ":"")+esc(f.n)+'</button>'});
-    if(hasOver)over.forEach(function(n,i){if(n)h+='<button type="button" class="cal-more" style="grid-column:'+(i+1)+';grid-row:'+(nl+2)+'" data-act="calDay" data-d="'+isoOf(addDays(ws,i))+'">+'+n+(mob?"":" más")+'</button>'});
+    if(hasOver)over.forEach(function(n,i){if(n)h+='<button type="button" class="cal-more" style="grid-column:'+(i+1)+';grid-row:'+(nl+2)+'" data-act="calExpand" data-w="'+wk+'" aria-label="Ver '+n+' actividades más esta semana">+'+n+(mob?"":" más")+'</button>'});
+    if(canLess)h+='<button type="button" class="cal-more less" style="grid-column:1/-1;grid-row:'+(nl+2)+'" data-act="calExpand" data-w="'+wk+'">▲ Ver menos</button>';
     h+='</div>';
   }
   $("#cal").innerHTML=h;
@@ -1461,7 +1465,7 @@ function buildAll(){buildSeg();buildItems();buildIdeas();buildScen();buildPeople
 
 /* ---------- ajustes ---------- */
 var UIKEY="cafefrio-ui", UI={theme:"light",hide:{}};
-try{var ur=JSON.parse(localStorage.getItem(UIKEY)||"{}");if(ur&&typeof ur==="object"){UI.theme=ur.theme||"light";UI.hide=ur.hide||{};UI.nf=ur.nf}}catch(e){}
+try{var ur=JSON.parse(localStorage.getItem(UIKEY)||"{}");if(ur&&typeof ur==="object"){UI.theme=ur.theme||"light";UI.hide=ur.hide||{};UI.nf=ur.nf;UI.calAll=!!ur.calAll}}catch(e){}
 function saveUI(){try{localStorage.setItem(UIKEY,JSON.stringify(UI))}catch(e){}}
 var SECS=[["hero","Veredicto","Si conviene y en cuánto se recupera"],["stats","Cifras clave","Inversión, aportado, utilidad y pagos"],["agenda","Agenda de la semana","Actividades de cada día"],["proximas","Próximas fechas","Lo que viene y lo atrasado"],["desglose","Desglose de la inversión","Avance por etapa"],["prestamo","Préstamo de amigos","Cuánto se ha pagado"],["escenarios","Escenarios de venta","Conservador, base y optimista"],["recordatorios","Recordatorios","Lista de pendientes"],["accesos","Accesos rápidos","Atajos a cada sección"]];
 function applyTheme(){
@@ -1743,6 +1747,8 @@ document.addEventListener("click",function(e){
   else if(a==="addPerson"){S.people.push({id:uid(),name:"Nueva persona",kind:"prestamo",amt:0});buildPeople();changed()}
   else if(a==="delPerson"){var dp=find(S.people,id);if(dp&&confirm(dp.kind==="prestamo"?'¿Quitar a "'+dp.name+'"?':'¿Quitar esta aportación de '+fmt(num(dp.amt))+'?')){S.people=S.people.filter(function(p){return p.id!==id});buildPeople();changed()}}
   else if(a==="calPrev"||a==="calNext"){calM+=a==="calPrev"?-1:1;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}buildCal()}
+  else if(a==="calExpand"){var w=b.dataset.w;if(calExp[w])delete calExp[w];else calExp[w]=1;buildCal()}
+  else if(a==="calAll"){UI.calAll=!UI.calAll;calExp={};saveUI();buildCal()}
   else if(a==="calToday"){var t0=new Date();calY=t0.getFullYear();calM=t0.getMonth();selDay=isoOf(today());buildCal()}
   else if(a==="calDay"){selDay=b.dataset.d;var cd=new Date(dt(selDay));if(cd.getMonth()!==calM||cd.getFullYear()!==calY){calY=cd.getFullYear();calM=cd.getMonth()}buildCal()}
   else if(a==="miniPrev"||a==="miniNext"){miniM+=a==="miniPrev"?-1:1;if(miniM<0){miniM=11;miniY--}if(miniM>11){miniM=0;miniY++}buildMini()}
