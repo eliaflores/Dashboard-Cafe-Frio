@@ -4,7 +4,7 @@ PRODID:-//Cafe Frio//Dashboard//ES
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:Café Frío
-X-WR-CALDESC:Frentes y recordatorios del Dashboard Café Frío
+X-WR-CALDESC:Actividades y recordatorios del Dashboard Café Frío
 X-WR-TIMEZONE:America/Chihuahua
 REFRESH-INTERVAL;VALUE=DURATION:PT1H
 X-PUBLISHED-TTL:PT1H
@@ -14,14 +14,14 @@ DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261110
 DTEND;VALUE=DATE:20261117
 SUMMARY:✓ Comprar Cafetera
-DESCRIPTION:Área: Decisiones y dinero. Hecho. Ver: https://eliaflores.gi
+DESCRIPTION:Área: Decisiones y dinero. Hecha. Ver: https://eliaflores.gi
  thub.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:frente-f2@cafefrio
 DTSTAMP:20260101T000000Z
-DTSTART;VALUE=DATE:20261114
+DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261130
 SUMMARY:Carpinteria
 DESCRIPTION:Área: Decisiones y dinero. Ver: https://eliaflores.github.io
