@@ -412,6 +412,11 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 .set-h{font:700 11px/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 10px}
 .set-h:first-of-type{margin-top:4px}
 .tb-set{margin-left:2px}
+.refresh-btn{display:flex;align-items:center;gap:12px;width:100%;margin-top:4px;padding:11px 14px;border:0;border-radius:14px;background:none;color:var(--ink2);font-size:15px;font-weight:500;text-align:left}
+.refresh-btn:hover{background:var(--surface2)}
+.spin .ic{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin .ic{animation:none}}
 
 /* ---------- calendario ---------- */
 .cal-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;align-items:start}
@@ -532,6 +537,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
 <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 </svg>
 
@@ -541,7 +547,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
   <div class="brand"><img class="logo" src="assets/logo.jpg" alt="Café Frío"><div><b>Dashboard Café Frío</b><small>Plan de inversión y arranque</small></div></div>
   <nav class="nav" id="nav"></nav>
   <div class="side-box"><span class="side-lab">Escenario de ventas</span><div class="seg seg-scen" role="group" aria-label="Escenario de ventas"></div></div>
-  <div class="side-foot"><nav class="nav" id="navSet"></nav><div class="save" data-s="local" role="status" style="margin-top:12px;padding:0 6px"><i></i><span>Solo en este dispositivo</span></div></div>
+  <div class="side-foot"><nav class="nav" id="navSet"></nav><button class="refresh-btn" type="button" data-act="refresh"><svg class="ic"><use href="#i-refresh"/></svg><span>Actualizar</span></button><div class="save" data-s="local" role="status" style="margin-top:12px;padding:0 6px"><i></i><span>Solo en este dispositivo</span></div></div>
 </aside>
 
 <div class="main">
@@ -549,6 +555,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
     <button class="ib" type="button" data-act="menu" aria-label="Abrir menú"><svg class="ic"><use href="#i-menu"/></svg></button>
     <span class="tb-t" id="tbTitle">Inicio</span>
     <div class="save" data-s="local"><i></i><span></span></div>
+    <button class="ib tb-set" type="button" data-act="refresh" aria-label="Actualizar"><svg class="ic"><use href="#i-refresh"/></svg></button>
     <a class="ib tb-set" href="#ajustes" aria-label="Ajustes"><svg class="ic"><use href="#i-gear"/></svg></a>
   </header>
 
@@ -1512,6 +1519,11 @@ function persist(){
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
   if(dbDoc&&canWrite){status("busy","Guardando…");clearTimeout(timer);timer=setTimeout(flush,900)}
 }
+function refreshApp(){
+  $$("[data-act=\"refresh\"]").forEach(function(b){b.classList.add("spin");b.disabled=true});
+  if(timer&&dbDoc&&canWrite){clearTimeout(timer);timer=null;flush()}
+  var t0=Date.now();(function wait(){if(writing&&Date.now()-t0<4000){setTimeout(wait,150);return}location.reload()})();
+}
 function flush(){
   if(writing){again=true;return}
   writing=true; myRev=uid()+Date.now().toString(36);
@@ -1612,6 +1624,7 @@ document.addEventListener("click",function(e){
   else if(a==="wkPrev"||a==="wkNext"){var nd=addDays(dt(homeDay),a==="wkPrev"?-7:7);homeDay=isoOf(nd);homeWk=monday(nd);buildWeek()}
   else if(a==="wkDay"){homeDay=b.dataset.d;buildWeek()}
   else if(a==="todoMore"){todoAll=!todoAll;buildTodos()}
+  else if(a==="refresh"){refreshApp()}
   else if(a==="nfOn"){nfEnable()}
   else if(a==="nfOff"){UI.nf.on=false;pushOff();saveUI();nfRender()}
   else if(a==="csOpen"){csOpen()}
