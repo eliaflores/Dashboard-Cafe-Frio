@@ -251,7 +251,18 @@ tr.sel .scx{color:inherit;opacity:.8}
 #scTbl th{white-space:normal;padding-inline:6px}
 #scTbl td{padding-inline:6px}
 #scTbl .in{min-width:58px}
-#pTbl td:first-child .in{min-width:150px} #pTbl select.in{min-width:132px}
+@media (max-width:640px){
+  #oTbl{min-width:0!important} #oTbl thead{display:none}
+  #oTbl tbody tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+  #oTbl tbody td{border:0;padding:0;min-width:0}
+  #oTbl tbody td:nth-child(1){grid-column:1/3;grid-row:1} #oTbl tbody td:nth-child(5){grid-column:3;grid-row:1}
+  #oTbl tbody td:nth-child(2){grid-column:1/-1;grid-row:2} #oTbl tbody td:nth-child(3){grid-column:1/2;grid-row:3} #oTbl tbody td:nth-child(4){grid-column:2/-1;grid-row:3}
+  #oTbl tbody td[colspan]{grid-column:1/-1}
+  #oTbl .in,#oTbl input[type=date]{min-width:0!important;width:100%} #oTbl .money{width:100%}
+  #oTbl tfoot tr.total{display:flex;justify-content:space-between;border-radius:12px;background:var(--surface2);margin-top:8px}
+  #oTbl tfoot tr.total td{background:none} #oTbl tfoot tr.total td:empty{display:none}
+}
+#pTbl td:first-child .in,#oTbl td:first-child .in{min-width:150px} #oTbl td:nth-child(2) .in{min-width:200px} #oTbl input[type=date]{min-width:150px}
 
 /* ---------- etapas ---------- */
 .lines{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
@@ -629,7 +640,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 
       <div class="card o4" data-sec="proximas"><div class="card-h"><h3>Próximas fechas</h3><a class="lnk" href="#calendario">Ver todo ›</a></div><ul class="up" id="upcoming"></ul></div>
 
-      <div class="card o6" data-sec="prestamo"><div class="card-h"><h3>Préstamo de amigos</h3><a class="lnk" href="#prestamos">Ver ›</a></div><div id="homeLoan"></div></div>
+      <div class="card o6" data-sec="prestamo"><div class="card-h"><h3>Aportaciones y préstamo</h3><a class="lnk" href="#prestamos">Ver ›</a></div><div id="homeLoan"></div></div>
 
       <div class="card o8" data-sec="recordatorios"><div class="card-h"><h3>Recordatorios</h3><span class="num muted" data-o="todoTxt"></span></div>
         <div class="bar" style="margin-bottom:6px"><i id="todoBar" style="width:0"></i></div><div id="todos"></div>
@@ -753,7 +764,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 
 <!-- =============== PRÉSTAMOS =============== -->
 <section id="prestamos" class="tab" hidden>
-  <div class="tab-h"><div><h1>Aportaciones y préstamos</h1><p class="sub">El préstamo no da propiedad del negocio. Se devuelve el monto más el interés pactado con una parte fija de la utilidad extra. Anoten lo que ya se le pagó a cada quien.</p></div></div>
+  <div class="tab-h"><div><h1>Aportaciones y préstamos</h1><p class="sub">Lo que ponen Maggie y Joaquín es su inversión como dueños: no se devuelve ni genera interés. El préstamo de amigos sí se devuelve, con el interés pactado y una parte fija de la utilidad extra.</p></div></div>
   <div class="grid kpis" id="loanKpis"></div>
   <div class="card">
     <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
@@ -764,8 +775,13 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
     </div>
     <p class="hint" style="margin-top:10px">La otra parte de la utilidad extra paga las etapas 2 y 3. Cuando una de las dos termina, su parte pasa a la otra.</p>
   </div>
-  <div class="card sp"><div class="card-h"><h3>Quién pone cuánto</h3></div>
-    <div class="tw"><table class="tbl" id="pTbl" style="min-width:900px"><thead><tr><th>Persona</th><th>Tipo</th><th>Aporta</th><th>Recibe en total</th><th>Pagado</th><th>Falta</th><th>Pago mensual aprox.</th><th>Termina</th><th></th></tr></thead><tbody id="pBody"></tbody><tfoot id="pFoot"></tfoot></table></div>
+  <div class="card sp"><div class="card-h"><h3>Dinero de los dueños</h3><span class="chip good">No es préstamo</span></div>
+    <p class="hint" style="margin:-6px 0 10px">Cada aportación de Maggie y Joaquín al negocio. Suma a lo reunido, pero no se devuelve ni cobra interés.</p>
+    <div class="tw"><table class="tbl" id="oTbl" style="min-width:640px"><thead><tr><th>Quién</th><th>Concepto</th><th>Fecha</th><th>Monto</th><th></th></tr></thead><tbody id="oBody"></tbody><tfoot id="oFoot"></tfoot></table></div>
+    <button class="add" type="button" data-act="addOwner">+ Agregar aportación de los dueños</button>
+  </div>
+  <div class="card sp"><div class="card-h"><h3>Préstamo de amigos</h3><span class="chip">Se devuelve</span></div>
+    <div class="tw"><table class="tbl" id="pTbl" style="min-width:820px"><thead><tr><th>Persona</th><th>Presta</th><th>Recibe en total</th><th>Pagado</th><th>Falta</th><th>Pago mensual aprox.</th><th>Termina</th><th></th></tr></thead><tbody id="pBody"></tbody><tfoot id="pFoot"></tfoot></table></div>
     <button class="add" type="button" data-act="addPerson">+ Agregar persona</button>
   </div>
   <div class="grid two-eq sp">
@@ -1085,7 +1101,7 @@ function calc(){
   M.sc=S.scen.map(function(sc){var u=sc.cups*S.days*net+dd(sc)+sc.ev*M.evp-S.extra;return {u:u,sales:sc.cups*S.days*S.price+num(sc.dx)*S.days*S.dPrice+sc.ev*S.evPrice,pb:u>0?M.stage1/u:Infinity}});
   M.act=M.sc[S.scenario]; M.actSc=S.scen[S.scenario];
   M.eq=net>0?Math.max(0,S.extra-dd(M.actSc))/(net*S.days):Infinity;
-  var apo=0,prin=0,pd=0; S.people.forEach(function(p){var a=num(p.amt);apo+=a;if(p.kind==="prestamo"){prin+=a;pd+=Math.min(num(p.paid),a*(1+S.rate/100))}});
+  var apo=0,prin=0,pd=0,own=0; S.people.forEach(function(p){var a=num(p.amt);apo+=a;if(p.kind==="prestamo"){prin+=a;pd+=Math.min(num(p.paid),a*(1+S.rate/100))}else own+=a});M.own=own;
   M.apo=apo; M.prin=prin; M.loanTot=prin*(1+S.rate/100); M.gap=M.stage1-apo; M.paidAll=pd;
   M.rows=[]; var bL=M.loanTot,bS=M.need23,sc=M.actSc; M.loanDone=null; M.stDone=null;
   for(var k=1;k<=60;k++){
@@ -1138,8 +1154,19 @@ function buildScen(){
   $("#scBody").innerHTML=S.scen.map(function(s,i){return '<tr data-sc="'+i+'"><td><button type="button" class="scbtn" data-act="scen" data-i="'+i+'"><span class="dot"></span>'+esc(s.n)+'</button></td><td><input class="in num" type="number" min="0" step="1" value="'+(BASE()+num(s.cups))+'" data-sc="'+i+'" data-f="tot" aria-label="Vasos al día en total, '+esc(s.n)+'"><small class="scx" data-o="scx'+i+'"></small></td><td><input class="in num" type="number" min="0" step="1" value="'+(DBASE()+num(s.dx))+'" data-sc="'+i+'" data-f="dtot" aria-label="Postres al día en total, '+esc(s.n)+'"><small class="scx" data-o="sdx'+i+'"></small></td><td><input class="in num" type="number" min="0" step="1" value="'+s.ev+'" data-sc="'+i+'" data-f="ev" aria-label="Eventos por mes, '+esc(s.n)+'"></td><td data-o="sc'+i+'s"></td><td data-o="sc'+i+'u"></td><td data-o="sc'+i+'p"></td></tr>'}).join("");
 }
 function buildPeople(){
-  $("#pBody").innerHTML=S.people.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" aria-label="Nombre"></td><td><select class="in" data-p="'+p.id+'" data-f="kind" aria-label="Tipo de aportación"><option value="dueno"'+(p.kind==="dueno"?" selected":"")+'>Dueño, aporta</option><option value="prestamo"'+(p.kind==="prestamo"?" selected":"")+'>Préstamo</option></select></td><td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto de '+esc(p.name)+'"></label></td><td data-o="pt'+p.id+'"></td><td>'+(p.kind==="prestamo"?'<label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="100" value="'+num(p.paid)+'" data-p="'+p.id+'" data-f="paid" aria-label="Pagado a '+esc(p.name)+'"></label>':'—')+'</td><td><span data-o="pf'+p.id+'"></span><div class="bar sm" style="margin-top:4px;min-width:70px"><i id="pb'+p.id+'" style="width:0"></i></div></td><td data-o="pm'+p.id+'"></td><td data-o="pe'+p.id+'"></td><td><button type="button" class="x" data-act="delPerson" data-id="'+p.id+'" aria-label="Quitar">'+ic("x")+'</button></td></tr>'}).join("");
+  var own=S.people.filter(function(p){return p.kind!=="prestamo"}), loans=S.people.filter(function(p){return p.kind==="prestamo"});
+  $("#oBody").innerHTML=own.length?own.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" placeholder="Maggie y Joaquín" aria-label="Quién aporta"></td>'+
+    '<td><input class="in" type="text" value="'+esc(p.note||"")+'" data-p="'+p.id+'" data-f="note" placeholder="Opcional, por ejemplo: cafetera" aria-label="Concepto"></td>'+
+    '<td><input class="in" type="date" value="'+esc(p.date||"")+'" data-p="'+p.id+'" data-f="date" aria-label="Fecha"></td>'+
+    '<td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto"></label></td>'+
+    '<td><button type="button" class="x" data-act="delPerson" data-id="'+p.id+'" aria-label="Quitar aportación">'+ic("x")+'</button></td></tr>'}).join(""):'<tr><td colspan="5" class="muted" style="text-align:center">Sin aportaciones de los dueños todavía.</td></tr>';
+  $("#pBody").innerHTML=loans.length?loans.map(function(p){return '<tr><td><input class="in" type="text" value="'+esc(p.name)+'" data-p="'+p.id+'" data-f="name" aria-label="Nombre"></td>'+
+    '<td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="500" value="'+num(p.amt)+'" data-p="'+p.id+'" data-f="amt" aria-label="Monto prestado por '+esc(p.name)+'"></label></td>'+
+    '<td data-o="pt'+p.id+'"></td><td><label class="money" style="margin-left:auto"><span>$</span><input type="number" inputmode="numeric" min="0" step="100" value="'+num(p.paid)+'" data-p="'+p.id+'" data-f="paid" aria-label="Pagado a '+esc(p.name)+'"></label></td>'+
+    '<td><span data-o="pf'+p.id+'"></span><div class="bar sm" style="margin-top:4px;min-width:70px"><i id="pb'+p.id+'" style="width:0"></i></div></td><td data-o="pm'+p.id+'"></td><td data-o="pe'+p.id+'"></td>'+
+    '<td><button type="button" class="x" data-act="delPerson" data-id="'+p.id+'" aria-label="Quitar">'+ic("x")+'</button></td></tr>'}).join(""):'<tr><td colspan="8" class="muted" style="text-align:center">Sin préstamos.</td></tr>';
 }
+
 var todoAll=false, tdEditing=null;
 function buildTodos(){
   var L=S.todo.filter(function(t){return !t.done}).concat(S.todo.filter(function(t){return t.done})), N=6, more=$("#todoMore");
@@ -1356,7 +1383,7 @@ function render(){
   function stat(c,lab,icn,val,sub,href,extra){return '<a class="kpi '+c+'" href="'+href+'"><div class="row">'+ic(icn)+'<span class="lab">'+lab+'</span></div><span class="go">'+ic("arrow")+'</span><div class="val num">'+val+'</div>'+(extra||"")+'<div class="sub">'+sub+'</div></a>'}
   $("#homeKpis").innerHTML=
     stat("k-plain","Inversión total","layers",fmt(tot3),Math.round(cpc)+"% cubierto","#etapas",'<div class="bar sm"><i style="width:'+cpc+'%"></i></div>')+
-    stat("k-sky","Aportado","users",fmt(M.apo),M.gap>0.5?"Faltan "+fmt(M.gap)+" para la etapa 1":"Cubre la etapa 1","#prestamos")+
+    stat("k-sky","Aportado","users",fmt(M.apo),"Dueños "+fmt(M.own)+" · amigos "+fmt(M.prin),"#prestamos")+
     stat("k-mint","Utilidad extra al mes","trend",fmt(A.u),"Escenario "+esc(M.actSc.n).toLowerCase(),"#simulador")+
     stat("k-lime","Pagado a amigos","return",fmt(M.paidAll),M.loanTot>0?Math.round(lpc)+"% de "+fmt(M.loanTot):"Sin préstamos","#prestamos",'<div class="bar sm"><i style="width:'+lpc+'%"></i></div>');
   var SC={1:["var(--morita)","var(--t-fresa)","var(--on-fresa)"],2:["var(--cafe)","var(--t-cafe)","var(--on-cafe)"],3:["var(--deco)","var(--t-matcha)","var(--on-matcha)"]};
@@ -1364,6 +1391,7 @@ function render(){
     '<div class="kv" style="margin-top:8px;padding:12px 14px;border-radius:14px;background:var(--surface2)"><strong>Total</strong><span class="num"><strong>'+fmt(tot3)+'</strong> <span class="muted">· '+Math.round(cpc)+'% cubierto</span></span></div>';
   $("#homeScen").innerHTML=S.scen.map(function(sc,i){var c=M.sc[i];return '<tr data-sc="'+i+'" class="'+(i===S.scenario?"sel":"")+'"><td><button type="button" class="scbtn" data-act="scen" data-i="'+i+'"><span class="dot"></span>'+esc(sc.n)+'</button></td><td>'+(B+num(sc.cups))+((DBASE()+num(sc.dx))?'<small class="scx">+'+(DBASE()+num(sc.dx))+' postres</small>':'')+'</td><td class="'+(c.u<0?"neg":"")+'">'+fmt(c.u)+'</td><td style="white-space:nowrap">'+(c.u>0?months(c.pb):"No")+'</td></tr>'}).join("");
   $("#homeLoan").innerHTML=
+    '<div class="kv"><span class="muted">Puesto por los dueños <span class="chip good" style="padding:1px 8px">no se devuelve</span></span><strong class="num">'+fmt(M.own)+'</strong></div>'+
     '<div class="kv"><span class="muted">Prestado por amigos</span><strong class="num">'+fmt(M.prin)+'</strong></div>'+
     '<div class="kv"><span class="muted">A devolver con '+f1(S.rate)+'% de interés</span><strong class="num">'+fmt(M.loanTot)+'</strong></div>'+
     '<div class="kv"><span class="muted">Ya pagado</span><strong class="num">'+fmt(M.paidAll)+' <span class="muted" style="font-weight:500">· '+Math.round(lpc)+'%</span></strong></div>'+
@@ -1376,21 +1404,22 @@ function render(){
     qa("#etapas","layers","var(--t-fresa)","var(--on-fresa)","Etapas",S.items.length+" gastos · "+Math.round(cpc)+"% cubierto")+
     qa("#calendario","cal","var(--t-foam)","var(--on-foam)","Calendario",S.frentes.length+" actividades · "+S.frentes.filter(function(f){return fst(f)==="late"}).length+" atrasadas")+
     qa("#simulador","sliders","var(--t-matcha)","var(--on-matcha)","Simulador","Mínimo "+(eqn===null?"—":f1(B+eqn))+" vasos al día")+
-    qa("#prestamos","users","var(--t-chai)","var(--on-chai)","Préstamos",S.people.length+" personas · "+Math.round(lpc)+"% pagado")+
+    qa("#prestamos","users","var(--t-chai)","var(--on-chai)","Préstamos","Dueños "+fmt(M.own)+" · préstamo "+Math.round(lpc)+"% pagado")+
     qa("#ideas","spark","var(--t-cafe)","var(--on-cafe)","Ideas",S.ideas.length+" ideas · "+nI[2]+" aprobadas");
   // préstamos
   var gapChip=M.gap>0.5?'<span class="chip warn">Faltan '+fmt(M.gap)+'</span>':'<span class="chip good">Cubierto</span>';
   $("#loanKpis").innerHTML=
-    kpi("k-sky","Aportado","users",fmt(M.apo),M.gap>0.5?"Faltan "+fmt(M.gap)+" para la etapa 1":"Cubre la etapa 1")+
-    kpi("k-plain","Necesario etapa 1","layers",fmt(M.stage1),"Equipo, trámites y arranque")+
-    kpi("k-mint","Prestado","coin",fmt(M.prin),"Se devuelve con "+f1(S.rate)+"% de interés")+
+    kpi("k-lime","Puesto por los dueños","users",fmt(M.own),"Maggie y Joaquín · no se devuelve")+
+    kpi("k-mint","Prestado por amigos","coin",fmt(M.prin),"Se devuelve con "+f1(S.rate)+"% de interés")+
+    kpi("k-plain","Total reunido","layers",fmt(M.apo),M.gap>0.5?"Faltan "+fmt(M.gap)+" para la etapa 1":"Cubre la etapa 1 ("+fmt(M.stage1)+")")+
     kpi("k-wine","A devolver","return",fmt(M.loanTot),"Aprox. "+fmt(M.firstL)+" al mes")+
     kpi("k-cafe","Ya pagado a amigos","check",fmt(M.paidAll),M.loanTot>0&&M.loanTot-M.paidAll<0.5?"Préstamo liquidado":"Falta "+fmt(Math.max(0,M.loanTot-M.paidAll))+" · "+Math.round(lpc)+"%",'<div class="bar sm"><i style="width:'+lpc+'%"></i></div>');
   S.people.forEach(function(p){var a=num(p.amt),pr=p.kind==="prestamo",tot=pr?a*(1+S.rate/100):0,sh=M.loanTot>0?tot/M.loanTot:0,pd=pr?Math.min(num(p.paid),tot):0;
     var bb=$("#pb"+p.id);if(bb){bb.style.width=(pr&&tot>0?pd/tot*100:0)+"%";bb.parentNode.style.display=pr?"":"none"}
     setO("pf"+p.id,pr?(tot-pd<0.5?"Liquidado":fmt(tot-pd)):"—");
     setO("pt"+p.id,pr?fmt(tot):"—"); setO("pm"+p.id,pr?fmt(M.firstL*sh):"—"); setO("pe"+p.id,pr?(M.loanDone?label(M.loanDone):"Más de 5 años"):"—")});
-  $("#pFoot").innerHTML='<tr class="total"><td>Total</td><td></td><td>'+fmt(M.apo)+'</td><td>'+fmt(M.loanTot)+'</td><td>'+fmt(M.paidAll)+'</td><td>'+fmt(Math.max(0,M.loanTot-M.paidAll))+'</td><td>'+fmt(M.firstL)+'</td><td>'+(M.loanDone?label(M.loanDone):"—")+'</td><td></td></tr><tr><td colspan="9" style="text-align:left;border:0;padding-top:10px">'+gapChip+' <span class="muted">Etapa 1 necesita '+fmt(M.stage1)+' y hay '+fmt(M.apo)+' aportados.</span></td></tr>';
+  $("#pFoot").innerHTML='<tr class="total"><td>Total</td><td>'+fmt(M.prin)+'</td><td>'+fmt(M.loanTot)+'</td><td>'+fmt(M.paidAll)+'</td><td>'+fmt(Math.max(0,M.loanTot-M.paidAll))+'</td><td>'+fmt(M.firstL)+'</td><td>'+(M.loanDone?label(M.loanDone):"—")+'</td><td></td></tr>';
+  $("#oFoot").innerHTML='<tr class="total"><td>Total de los dueños</td><td></td><td></td><td>'+fmt(M.own)+'</td><td></td></tr><tr><td colspan="5" style="text-align:left;border:0;padding-top:10px">'+gapChip+' <span class="muted">Etapa 1 necesita '+fmt(M.stage1)+' y entre dueños y amigos hay '+fmt(M.apo)+'.</span></td></tr>';
   setO("gapOpen",fmt(Math.max(0,tot3-M.apo)));
   setO("rateTxt",f1(S.rate)+"%"); setO("shareTxt",f1(S.share)+"%");
   $("#mBody").innerHTML=M.rows.slice(0,36).map(function(r){return '<tr><td>'+r.label+'</td><td class="'+(r.u<0?"neg":"")+'">'+fmt(r.u)+'</td><td>'+fmt(r.pL)+'</td><td>'+fmt(r.pS)+'</td><td>'+fmt(r.free)+'</td></tr>'}).join("");
@@ -1651,6 +1680,7 @@ document.addEventListener("change",function(e){var el=e.target,d=el.dataset||{};
     $("#sh-s").value=f.s;$("#sh-e").value=f.e;
     if(k==="s"){var sd=new Date(dt(f.s));calY=sd.getFullYear();calM=sd.getMonth();selDay=f.s}
     changed();return}
+  if(d.p&&el.type==="date"){setPath(el);changed();return}
   if(el.tagName==="SELECT"&&setPath(el)){if(d.p&&d.f==="kind")buildPeople();changed();return}
   if(d.act==="todo"){var t=find(S.todo,d.id);if(t){t.done=el.checked;changed()}}
   if(d.secT){UI.hide[d.secT]=!el.checked;saveUI();applySecs()}
@@ -1672,8 +1702,9 @@ document.addEventListener("click",function(e){
   else if(a==="iEdit"){iEditing=iEditing===id?null:id;buildItems();var ie2=$("#ie-n");if(ie2)ie2.focus()}
   else if(a==="iDone"){iEditing=null;buildItems()}
   else if(a==="delItem"){var di=find(S.items,id);if(di&&confirm('¿Eliminar "'+di.name+'"?')){S.items=S.items.filter(function(i){return i.id!==id});iEditing=null;buildItems();changed()}}
+  else if(a==="addOwner"){S.people.push({id:uid(),name:"Maggie y Joaquín",kind:"dueno",amt:0,note:"",date:isoOf(today())});buildPeople();changed()}
   else if(a==="addPerson"){S.people.push({id:uid(),name:"Nueva persona",kind:"prestamo",amt:0});buildPeople();changed()}
-  else if(a==="delPerson"){var dp=find(S.people,id);if(dp&&confirm('¿Quitar a "'+dp.name+'"?')){S.people=S.people.filter(function(p){return p.id!==id});buildPeople();changed()}}
+  else if(a==="delPerson"){var dp=find(S.people,id);if(dp&&confirm(dp.kind==="prestamo"?'¿Quitar a "'+dp.name+'"?':'¿Quitar esta aportación de '+fmt(num(dp.amt))+'?')){S.people=S.people.filter(function(p){return p.id!==id});buildPeople();changed()}}
   else if(a==="calPrev"||a==="calNext"){calM+=a==="calPrev"?-1:1;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}buildCal()}
   else if(a==="calToday"){var t0=new Date();calY=t0.getFullYear();calM=t0.getMonth();selDay=isoOf(today());buildCal()}
   else if(a==="calDay"){selDay=b.dataset.d;var cd=new Date(dt(selDay));if(cd.getMonth()!==calM||cd.getFullYear()!==calY){calY=cd.getFullYear();calM=cd.getMonth()}buildCal()}
