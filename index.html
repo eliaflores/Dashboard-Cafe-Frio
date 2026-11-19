@@ -492,6 +492,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 .cal-ev.late{outline:1.5px solid var(--bad);outline-offset:-1.5px}
 .cal-more{position:relative;z-index:1;border:0;background:none;font:600 10.5px/16px var(--f-mono);color:var(--muted);text-align:left;padding:0 7px}
 .cal-more:hover{color:var(--ink)}
+.cal-ev .ev-t{font-family:var(--f-num);font-weight:700;opacity:.8}
 .cal-more.less{text-align:center}
 .day-card h3{font:600 18px/1.2 var(--f-display);margin:0 0 4px}
 .fr{display:flex;align-items:center;gap:12px;width:100%;padding:10px 8px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:inherit;border-radius:0}
@@ -655,12 +656,6 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
       <div class="card o4" data-sec="proximas"><div class="card-h"><h3>Próximas fechas</h3><a class="lnk" href="#calendario">Ver todo ›</a></div><ul class="up" id="upcoming"></ul></div>
 
       <div class="card o6" data-sec="prestamo"><div class="card-h"><h3>Aportaciones y préstamo</h3><a class="lnk" href="#prestamos">Ver ›</a></div><div id="homeLoan"></div></div>
-
-      <div class="card o8" data-sec="recordatorios"><div class="card-h"><h3>Recordatorios</h3><span class="num muted" data-o="todoTxt"></span></div>
-        <div class="bar" style="margin-bottom:6px"><i id="todoBar" style="width:0"></i></div><div id="todos"></div>
-        <button class="more" type="button" data-act="todoMore" id="todoMore" hidden></button>
-        <div class="addrow"><input class="in" type="text" id="todoName" placeholder="Nuevo recordatorio" aria-label="Nuevo recordatorio"><input class="in" type="datetime-local" id="todoDue" aria-label="Fecha y hora del aviso (opcional)" title="Fecha y hora del aviso (opcional)" style="flex:0 1 210px"><button class="btn" type="button" data-act="addTodo">Agregar</button></div>
-        <p class="hint" style="margin-top:8px">Ponle fecha y hora a un recordatorio para recibir el aviso. Toca el reloj de uno existente para cambiarla.</p></div>
 
       <div class="card o9" data-sec="accesos"><div class="card-h"><h3>Accesos rápidos</h3></div><div class="qa" id="quick"></div></div>
     </div>
@@ -859,7 +854,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
         <ul class="diag" id="nfDiag"></ul>
         <div id="nfOpts">
           <div class="set-row"><span class="set-m"><b>Resumen diario</b><small>Qué empieza, qué termina, fechas clave y atrasos del día</small></span><input class="in" type="time" id="nfHour" style="width:150px" aria-label="Hora del resumen diario"></div>
-          <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Recordatorios con hora</b><small>Avisa a la hora que les pongas</small></span><input type="checkbox" class="sw" data-nf="todo"></label>
+          <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Actividades con hora</b><small>Avisa a la hora que les pongas en el calendario</small></span><input type="checkbox" class="sw" data-nf="todo"></label>
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Actividades del calendario</b><small>Las que empiezan o terminan ese día</small></span><input type="checkbox" class="sw" data-nf="fr"></label>
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Fechas clave</b><small>3 días antes, un día antes y el mismo día</small></span><input type="checkbox" class="sw" data-nf="key"></label>
           <label class="set-row" style="cursor:pointer"><span class="set-m"><b>Atrasadas</b><small>Actividades que ya pasaron su fecha</small></span><input type="checkbox" class="sw" data-nf="late"></label>
@@ -931,7 +926,7 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 <div class="sheet-bg" id="calSheet" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="csTitle">
     <div class="sh-h"><h3 id="csTitle">Sincronizar con tu calendario</h3><button class="x" type="button" data-act="csClose" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button></div>
-    <p class="hint">Suscríbete una sola vez y las actividades y recordatorios se actualizan solos, con sus alarmas. La página publica los cambios cada 15 a 30 minutos y cada app los revisa a su ritmo: Apple te deja elegir cada hora; Google puede tardar unas horas.</p>
+    <p class="hint">Suscríbete una sola vez y las actividades se actualizan solas, con sus horas y alarmas. La página publica los cambios cada 15 a 30 minutos y cada app los revisa a su ritmo: Apple te deja elegir cada hora; Google puede tardar unas horas.</p>
     <div class="qa" style="margin-top:14px">
       <a class="qa-i" id="csApple" href="#"><span class="qa-ic" style="--b:var(--t-fresa);--c:var(--on-fresa)"><svg class="ic"><use href="#i-cal"/></svg></span><span class="um"><b>Apple Calendar</b><small>iPhone, iPad y Mac</small></span><span class="chev">›</span></a>
       <a class="qa-i" id="csGoogle" href="#" target="_blank" rel="noopener"><span class="qa-ic" style="--b:var(--t-foam);--c:var(--on-foam)"><svg class="ic"><use href="#i-cal"/></svg></span><span class="um"><b>Google Calendar</b><small>Android, computadora y cualquier app conectada a Google</small></span><span class="chev">›</span></a>
@@ -955,7 +950,8 @@ button.qa-i{border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
       <label>Responsable<input class="in" type="text" id="sh-w" placeholder="Asignar"></label>
       <label>Inicio<input class="in" type="date" id="sh-s" data-f="s"></label>
       <label>Fin<input class="in" type="date" id="sh-e" data-f="e"></label>
-      <label class="w2">Estado<select class="in" id="sh-st"><option value="0">Pendiente</option><option value="1">En curso</option><option value="2">Hecha</option></select></label>
+      <label>Hora (opcional)<input class="in" type="time" id="sh-t" data-f="t" aria-label="Hora de la actividad"></label>
+      <label>Estado<select class="in" id="sh-st"><option value="0">Pendiente</option><option value="1">En curso</option><option value="2">Hecha</option></select></label>
       <label class="chk w2"><input type="checkbox" id="sh-k" data-f="k"> Fecha clave (aparece con cuenta regresiva)</label>
     </div>
     <div class="sh-a"><button class="del" type="button" data-act="fDel" id="sh-del">Eliminar actividad</button><button class="btn" type="button" data-act="shClose">Listo</button></div>
@@ -1186,6 +1182,7 @@ function buildPeople(){
 
 var todoAll=false, tdEditing=null;
 function buildTodos(){
+  if(!$("#todos"))return;
   var L=S.todo.filter(function(t){return !t.done}).concat(S.todo.filter(function(t){return t.done})), N=6, more=$("#todoMore");
   if(more){more.hidden=L.length<=N;more.textContent=todoAll?"Ver menos":"Ver todos ("+L.length+")"}
   if(!todoAll)L=L.slice(0,N);
@@ -1222,9 +1219,9 @@ var calY, calM, selDay, miniY, miniM, shId=null;
 function area(f){return AREAS[f.a]||AREAS.ope}
 function aName(k){return (S.areaNames&&S.areaNames[k])||AREAS[k].t}
 function fst(f){var o=S.follow[f.id]||{};var st=o.st||0;if(st!==2&&dt(f.e)<today())return "late";return st}
-function evsOn(iso){var t=dt(iso);return S.frentes.filter(function(f){return dt(f.s)<=t&&dt(f.e)>=t}).sort(function(a,b){return dt(a.s)-dt(b.s)})}
+function evsOn(iso){var t=dt(iso);return S.frentes.filter(function(f){return dt(f.s)<=t&&dt(f.e)>=t}).sort(function(a,b){return dt(a.s)-dt(b.s)||String(a.t||"99").localeCompare(String(b.t||"99"))})}
 function stChip(st){var m={0:["Pendiente",""],1:["En curso","warn"],2:["Hecha","good"],late:["Atrasada","bad"]}[st];return '<span class="chip '+m[1]+'">'+m[0]+'</span>'}
-function when(f){return f.s===f.e?dlab(f.s):dlab(f.s)+" – "+dlab(f.e)}
+function when(f){return (f.s===f.e?dlab(f.s):dlab(f.s)+" – "+dlab(f.e))+(f.t?" · "+f.t:"")}
 function frRow(f){var o=S.follow[f.id]||{};
   return '<button type="button" class="fr" data-act="fOpen" data-id="'+f.id+'"><i style="background:'+area(f).c+';--b:'+area(f).b+'"></i><span class="fr-m"><b>'+(f.k?"◆ ":"")+esc(f.n)+'</b><small>'+when(f)+(o.who?" · "+esc(o.who):"")+'</small></span>'+stChip(fst(f))+'</button>'}
 function monthStart(y,m){var f=new Date(y,m,1).getTime();return addDays(f,-((new Date(f).getDay()+6)%7))}
@@ -1246,7 +1243,7 @@ function buildCal(){
     for(var i=0;i<7;i++){var t=addDays(ws,i),iso=isoOf(t),d=new Date(t);
       h+='<button type="button" class="cal-d'+(d.getMonth()!==calM?" out":"")+(t===T?" today":"")+(iso===selDay?" sel":"")+(i>4?" we":"")+'" style="grid-column:'+(i+1)+'" data-act="calDay" data-d="'+iso+'" aria-label="'+d.getDate()+' de '+MESL[d.getMonth()]+'"><span class="dn">'+d.getDate()+'</span></button>'}
     evs.forEach(function(ev){if(ev.L>=MAXL)return;var f=ev.f,A=area(f),st=fst(f);
-      h+='<button type="button" class="cal-ev'+(st===2?" done":"")+(st==="late"?" late":"")+(dt(f.s)<ws?" cl":"")+(dt(f.e)>we?" cr":"")+'" style="--c:'+A.c+';--b:'+A.b+';--cf:'+A.f+';grid-column:'+(ev.si+1)+'/'+(ev.ei+2)+';grid-row:'+(ev.L+2)+'" data-act="fOpen" data-id="'+f.id+'" title="'+esc(f.n)+' · '+when(f)+'">'+(f.k?"◆ ":"")+esc(f.n)+'</button>'});
+      h+='<button type="button" class="cal-ev'+(st===2?" done":"")+(st==="late"?" late":"")+(dt(f.s)<ws?" cl":"")+(dt(f.e)>we?" cr":"")+'" style="--c:'+A.c+';--b:'+A.b+';--cf:'+A.f+';grid-column:'+(ev.si+1)+'/'+(ev.ei+2)+';grid-row:'+(ev.L+2)+'" data-act="fOpen" data-id="'+f.id+'" title="'+esc(f.n)+' · '+when(f)+'">'+(f.k?"◆ ":"")+(f.t?'<b class="ev-t">'+f.t+'</b> ':'')+esc(f.n)+'</button>'});
     if(hasOver)over.forEach(function(n,i){if(n)h+='<button type="button" class="cal-more" style="grid-column:'+(i+1)+';grid-row:'+(nl+2)+'" data-act="calExpand" data-w="'+wk+'" aria-label="Ver '+n+' actividades más esta semana">+'+n+(mob?"":" más")+'</button>'});
     if(canLess)h+='<button type="button" class="cal-more less" style="grid-column:1/-1;grid-row:'+(nl+2)+'" data-act="calExpand" data-w="'+wk+'">▲ Ver menos</button>';
     h+='</div>';
@@ -1274,7 +1271,7 @@ function buildUpcoming(){
   S.frentes.forEach(function(f){var st=fst(f),s=dt(f.s),e=dt(f.e);
     if(st===2)return;
     if(st==="late")out.push({f:f,t:e,o:0,txt:"Debía terminar el "+dlab(f.e)});
-    else if(s>=T&&(s-T<=21*DAY||(f.k&&s-T<=120*DAY)))out.push({f:f,t:s,o:1,txt:f.k?"Fecha clave":(f.s===f.e?"Ese día":"Empieza · termina el "+dlab(f.e))});
+    else if(s>=T&&(s-T<=21*DAY||(f.k&&s-T<=120*DAY)))out.push({f:f,t:s,o:1,txt:(f.k?"Fecha clave":(f.s===f.e?"Ese día":"Empieza · termina el "+dlab(f.e)))+(f.t?" · "+f.t:"")});
     else if(s<T&&e>=T&&e-T<=7*DAY)out.push({f:f,t:e,o:1,txt:"Termina · empezó el "+dlab(f.s)});
   });
   S.todo.forEach(function(t){if(t.done||!t.due)return;var tt=dtt(t.due);if(!isFinite(tt))return;var day=new Date(tt).setHours(0,0,0,0);
@@ -1307,7 +1304,7 @@ function buildWeek(){
 function buildFollow(){buildCal();buildMini();buildUpcoming();buildWeek()}
 function fillSheet(){
   var f=find(S.frentes,shId);if(!f){closeSheet();return}var o=S.follow[f.id]||{};
-  ["sh-n","sh-a","sh-s","sh-e","sh-k"].forEach(function(i){$("#"+i).dataset.fe=f.id});
+  ["sh-n","sh-a","sh-s","sh-e","sh-k","sh-t"].forEach(function(i){$("#"+i).dataset.fe=f.id}); $("#sh-t").value=f.t||"";
   $("#sh-w").dataset.fw=f.id; $("#sh-st").dataset.fs=f.id; $("#sh-del").dataset.id=f.id;
   $("#sh-n").value=f.n; $("#sh-a").value=f.a in AREAS?f.a:"ope"; $("#sh-s").value=f.s; $("#sh-e").value=f.e; $("#sh-k").checked=!!f.k;
   $("#sh-w").value=o.who||""; $("#sh-st").value=String(o.st||0);
@@ -1459,7 +1456,7 @@ function render(){
   $("#hitos").hidden=!keys.length;
   buildFollow();
   // recordatorios
-  var dn=S.todo.filter(function(x){return x.done}).length; setO("todoTxt",dn+" de "+S.todo.length); $("#todoBar").style.width=(S.todo.length?dn/S.todo.length*100:0)+"%";
+  var dn=S.todo.filter(function(x){return x.done}).length; setO("todoTxt",dn+" de "+S.todo.length); if($("#todoBar"))$("#todoBar").style.width=(S.todo.length?dn/S.todo.length*100:0)+"%";
 }
 function buildAll(){buildSeg();buildItems();buildIdeas();buildScen();buildPeople();buildTodos();buildInputs();if(shId)fillSheet()}
 
@@ -1467,7 +1464,7 @@ function buildAll(){buildSeg();buildItems();buildIdeas();buildScen();buildPeople
 var UIKEY="cafefrio-ui", UI={theme:"light",hide:{}};
 try{var ur=JSON.parse(localStorage.getItem(UIKEY)||"{}");if(ur&&typeof ur==="object"){UI.theme=ur.theme||"light";UI.hide=ur.hide||{};UI.nf=ur.nf;UI.calAll=!!ur.calAll}}catch(e){}
 function saveUI(){try{localStorage.setItem(UIKEY,JSON.stringify(UI))}catch(e){}}
-var SECS=[["hero","Veredicto","Si conviene y en cuánto se recupera"],["stats","Cifras clave","Inversión, aportado, utilidad y pagos"],["agenda","Agenda de la semana","Actividades de cada día"],["proximas","Próximas fechas","Lo que viene y lo atrasado"],["desglose","Desglose de la inversión","Avance por etapa"],["prestamo","Préstamo de amigos","Cuánto se ha pagado"],["escenarios","Escenarios de venta","Conservador, base y optimista"],["recordatorios","Recordatorios","Lista de pendientes"],["accesos","Accesos rápidos","Atajos a cada sección"]];
+var SECS=[["hero","Veredicto","Si conviene y en cuánto se recupera"],["stats","Cifras clave","Inversión, aportado, utilidad y pagos"],["agenda","Agenda de la semana","Actividades de cada día"],["proximas","Próximas fechas","Lo que viene y lo atrasado"],["desglose","Desglose de la inversión","Avance por etapa"],["prestamo","Préstamo de amigos","Cuánto se ha pagado"],["escenarios","Escenarios de venta","Conservador, base y optimista"],["accesos","Accesos rápidos","Atajos a cada sección"]];
 function applyTheme(){
   var t=UI.theme||"light"; document.documentElement.setAttribute("data-theme",t);
   var dark=t==="dark"||(t==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);
@@ -1521,6 +1518,8 @@ function notify(title,body,tag,hash){
 function nfCheck(){
   var P=UI.nf; if(!P.on||nfPerm()!=="granted")return;
   var now=Date.now(), T=today(), sent=sentLog(), ch=false;
+  if(P.todo)S.frentes.forEach(function(f){if(!f.t||(S.follow[f.id]||{}).st===2)return;var at=dtt(f.s+"T"+f.t);if(!isFinite(at)||at>now||now-at>7*DAY)return;var k="act:"+f.id+":"+f.s+"T"+f.t;
+    if(!sent[k]){notify("Actividad · Café Frío",f.n+" ("+dueLab(f.s+"T"+f.t)+")","act-"+f.id,"#calendario");sent[k]=now;ch=true}});
   if(P.todo)S.todo.forEach(function(t){if(t.done||!t.due)return;var tt=dtt(t.due);if(!isFinite(tt)||tt>now||now-tt>7*DAY)return;var k="todo:"+t.id+":"+t.due;
     if(!sent[k]){notify("Recordatorio · Café Frío",t.t+" ("+dueLab(t.due)+")","todo-"+t.id,"#inicio");sent[k]=now;ch=true}});
   var hm=String(P.hour||"09:00").split(":"), at=new Date(T);at.setHours(+hm[0]||0,+hm[1]||0,0,0);
@@ -1571,9 +1570,12 @@ function icsExport(){
   var now=new Date(), stamp=now.toISOString().replace(/[-:]/g,"").replace(/\.\d+/,""), L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Cafe Frio//Dashboard//ES","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Café Frío"];
   var al=function(desc,trig){L.push("BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(desc),"TRIGGER:"+trig,"END:VALARM")};
   S.frentes.forEach(function(f){var o=S.follow[f.id]||{};if(o.st===2)return;
-    L.push("BEGIN:VEVENT","UID:frente-"+f.id+"@cafefrio","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+icsDate(dt(f.s)),"DTEND;VALUE=DATE:"+icsDate(addDays(dt(f.e),1)),
+    var tt=f.t?dtt(f.s+"T"+f.t):NaN, te=f.t?dtt(f.e+"T"+f.t)+3600e3:NaN;
+    L.push("BEGIN:VEVENT","UID:frente-"+f.id+"@cafefrio","DTSTAMP:"+stamp);
+    if(isFinite(tt))L.push("DTSTART:"+icsDT(tt),"DTEND:"+icsDT(te));else L.push("DTSTART;VALUE=DATE:"+icsDate(dt(f.s)),"DTEND;VALUE=DATE:"+icsDate(addDays(dt(f.e),1)));
+    L.push(
       "SUMMARY:"+icsEsc((f.k?"◆ ":"")+f.n+" · Café Frío"),"DESCRIPTION:"+icsEsc("Área: "+aName(f.a in AREAS?f.a:"ope")+(o.who?". Responsable: "+o.who:"")+"."));
-    al(f.n,"PT9H"); if(f.k){al("Mañana: "+f.n,"-PT15H");al("En 3 días: "+f.n,"-P2DT15H")}
+    if(isFinite(tt)){al(f.n,"PT0M");if(f.k){al("Mañana: "+f.n,"-P1D");al("En 3 días: "+f.n,"-P3D")}}else{al(f.n,"PT9H"); if(f.k){al("Mañana: "+f.n,"-PT15H");al("En 3 días: "+f.n,"-P2DT15H")}}
     L.push("END:VEVENT")});
   S.todo.forEach(function(t){if(t.done||!t.due)return;var tt=dtt(t.due);if(!isFinite(tt))return;
     L.push("BEGIN:VEVENT","UID:recordatorio-"+t.id+"@cafefrio","DTSTAMP:"+stamp,"DTSTART:"+icsDT(tt),"DTEND:"+icsDT(tt+30*60000),"SUMMARY:"+icsEsc("Recordatorio: "+t.t));

@@ -55,18 +55,23 @@ function fold(line) { const out = []; let cur = ""; for (const ch of line) { if 
 function buildICS(S) {
   const STAMP = "20260101T000000Z";
   const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Cafe Frio//Dashboard//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-    "X-WR-CALNAME:Café Frío", "X-WR-CALDESC:Actividades y recordatorios del Dashboard Café Frío", "X-WR-TIMEZONE:" + DEF_TZ,
+    "X-WR-CALNAME:Café Frío", "X-WR-CALDESC:Actividades del Dashboard Café Frío", "X-WR-TIMEZONE:" + DEF_TZ,
     "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H"];
   const alarm = (desc, trig) => L.push("BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc(desc), "TRIGGER:" + trig, "END:VALARM");
   const follow = S.follow || {}, names = S.areaNames || {};
   for (const f of S.frentes || []) {
     const o = follow[f.id] || {}; if (!/^\d{4}-\d{2}-\d{2}$/.test(f.s || "") || !/^\d{4}-\d{2}-\d{2}$/.test(f.e || "")) continue;
     const done = o.st === 2;
-    L.push("BEGIN:VEVENT", `UID:frente-${f.id}@cafefrio`, "DTSTAMP:" + STAMP, "DTSTART;VALUE=DATE:" + ymd(f.s), "DTEND;VALUE=DATE:" + ymd(addDaysStr(f.e, 1)),
+    const timed = /^\d{2}:\d{2}$/.test(f.t || "");
+    const fl = (d, hm, plusMin) => { const [y, m, dd] = d.split("-").map(Number), [h, mi] = hm.split(":").map(Number), x = new Date(Date.UTC(y, m - 1, dd, h, mi + (plusMin || 0))); return `${x.getUTCFullYear()}${pad(x.getUTCMonth() + 1)}${pad(x.getUTCDate())}T${pad(x.getUTCHours())}${pad(x.getUTCMinutes())}00`; };
+    L.push("BEGIN:VEVENT", `UID:frente-${f.id}@cafefrio`, "DTSTAMP:" + STAMP, ...(timed ? ["DTSTART:" + fl(f.s, f.t), "DTEND:" + fl(f.e, f.t, 60)] : ["DTSTART;VALUE=DATE:" + ymd(f.s), "DTEND;VALUE=DATE:" + ymd(addDaysStr(f.e, 1))]),
       "SUMMARY:" + esc((done ? "✓ " : "") + (f.k ? "◆ " : "") + f.n),
       "DESCRIPTION:" + esc(`Área: ${names[f.a] || AREAS[f.a] || "Operación"}.` + (o.who ? ` Responsable: ${o.who}.` : "") + (done ? " Hecha." : "") + ` Ver: ${SITE}#calendario`),
       "TRANSP:TRANSPARENT");
-    if (!done) { alarm(f.n, "PT9H"); if (f.k) { alarm("Mañana: " + f.n, "-PT15H"); alarm("En 3 días: " + f.n, "-P2DT15H"); } }
+    if (!done) {
+      if (timed) { alarm(f.n, "PT0M"); if (f.k) { alarm("Mañana: " + f.n, "-P1D"); alarm("En 3 días: " + f.n, "-P3D"); } }
+      else { alarm(f.n, "PT9H"); if (f.k) { alarm("Mañana: " + f.n, "-PT15H"); alarm("En 3 días: " + f.n, "-P2DT15H"); } }
+    }
     L.push("END:VEVENT");
   }
   for (const t of S.todo || []) {
@@ -155,6 +160,11 @@ async function main() {
       const td = localDate(now, tz);
       const body = k === "t" ? `Se agregó tarea: ${it.t} · ${venceText(String(it.due || "").slice(0, 10), td, String(it.due || "").slice(11, 16))}` : `Se agregó actividad: ${it.n} · ${venceText(it.e, td)}`;
       await send(sub, { title: k === "t" ? "Nueva tarea · Café Frío" : "Nueva actividad · Café Frío", body, tag: "new-" + it.id, url: k === "t" ? "./#inicio" : "./#calendario" }, `new:${sub.id}:${it.id}`);
+    }
+    if (P.todo) for (const f of S.frentes || []) { // actividades con hora: aviso a esa hora
+      if (!/^\d{2}:\d{2}$/.test(f.t || "") || ((S.follow || {})[f.id] || {}).st === 2) continue;
+      const at = zonedToUtc(f.s + "T" + f.t, tz);
+      if (isFinite(at) && at <= now && now - at < 3 * 3600e3) await send(sub, { title: "Actividad · Café Frío", body: `${f.n} (${dueLab(f.s + "T" + f.t)})`, tag: "act-" + f.id, url: "./#calendario" }, `act:${sub.id}:${f.id}:${f.s}T${f.t}`);
     }
     const today = localDate(now, tz), [hh, mm] = String(sub.hour || "09:00").split(":").map(Number);
     if (localMinutes(now, tz) >= (hh || 0) * 60 + (mm || 0)) {
