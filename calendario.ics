@@ -4,7 +4,7 @@ PRODID:-//Cafe Frio//Dashboard//ES
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:Café Frío
-X-WR-CALDESC:Actividades y recordatorios del Dashboard Café Frío
+X-WR-CALDESC:Actividades del Dashboard Café Frío
 X-WR-TIMEZONE:America/Chihuahua
 REFRESH-INTERVAL;VALUE=DURATION:PT1H
 X-PUBLISHED-TTL:PT1H
