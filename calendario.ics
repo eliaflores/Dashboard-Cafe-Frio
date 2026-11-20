@@ -193,15 +193,10 @@ UID:frente-frdtogb@cafefrio
 DTSTAMP:20260101T000000Z
 DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261119
-SUMMARY:Dinero Pt 1
-DESCRIPTION:Área: Operación. Responsable: Todos . Ver: https://eliaflor
- es.github.io/Dashboard-Cafe-Frio/#calendario
+SUMMARY:✓ Dinero Pt 1
+DESCRIPTION:Área: Operación. Responsable: Todos . Hecha. Ver: https://e
+ liaflores.github.io/Dashboard-Cafe-Frio/#calendario
 TRANSP:TRANSPARENT
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Dinero Pt 1
-TRIGGER:PT9H
-END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:frente-fyxbnpg@cafefrio
